@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { RetroCard } from '@/components/ui/RetroCard';
 import { RetroButton } from '@/components/ui/RetroButton';
 import { Badge } from '@/components/ui/Badge';
-import { MessageSquare, Send, Mail, MapPin, CheckCircle2, Phone, Sparkles } from 'lucide-react';
+import { MessageSquare, Send, Mail, MapPin, CheckCircle2, Sparkles, ArrowRight, Phone } from 'lucide-react';
 import { InstagramIcon } from '@/components/ui/SocialIcons';
 
 export function ContactWidget() {
@@ -24,8 +24,16 @@ export function ContactWidget() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.name.trim() || !formData.message.trim()) {
-      alert('Mohon isi nama lengkap dan pesan Anda.');
+    if (!formData.name.trim()) {
+      alert('Mohon masukkan Nama Lengkap Anda.');
+      return;
+    }
+    if (!formData.whatsapp.trim()) {
+      alert('Mohon masukkan Nomor WhatsApp Anda agar tim kami dapat merespons.');
+      return;
+    }
+    if (!formData.message.trim()) {
+      alert('Mohon tuliskan Pesan / Pertanyaan / Ajakan Kolaborasi Anda.');
       return;
     }
 
@@ -33,9 +41,9 @@ export function ContactWidget() {
       `Halo Tim SAN Chapter Tasikmalaya,\n\n` +
       `Perkenalkan saya:\n` +
       `• Nama: ${formData.name.trim()}\n` +
-      `• No. WhatsApp: ${formData.whatsapp.trim() || '-'}\n` +
+      `• No. WhatsApp: ${formData.whatsapp.trim()}\n` +
       `• Email: ${formData.email.trim() || '-'}\n\n` +
-      `Pesan:\n${formData.message.trim()}`
+      `Pesan / Ajakan Kolaborasi:\n${formData.message.trim()}`
     );
 
     const waUrl = `https://wa.me/${OFFICIAL_WA_NUMBER}?text=${text}`;
@@ -74,7 +82,7 @@ export function ContactWidget() {
       {/* Main Grid: Info Cards + Form */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Left Column: Brand Statement & Contact Details */}
-        <div className="lg:col-span-5 space-y-6">
+        <div className="lg:col-span-5 space-y-5">
           <div className="bg-gradient-to-br from-amber-300 via-amber-200 to-amber-400 border-4 border-black rounded-3xl p-6 md:p-8 shadow-[6px_6px_0px_0px_#000] space-y-4">
             <Badge variant="yellow" className="bg-white text-slate-950 font-black">
               <Sparkles className="w-4 h-4 text-slate-950 inline mr-1" /> FAST RESPONSE
@@ -89,58 +97,71 @@ export function ContactWidget() {
             </p>
 
             <div className="pt-2 flex flex-col gap-3">
+              {/* WhatsApp Action Card (No raw number display) */}
               <a
                 href={`https://wa.me/${OFFICIAL_WA_NUMBER}`}
                 target="_blank"
                 rel="noreferrer"
-                className="flex items-center gap-3 p-3.5 rounded-2xl bg-white border-3 border-black font-black text-xs sm:text-sm text-slate-950 shadow-[3px_3px_0px_0px_#000] hover:bg-emerald-100 hover:translate-x-1 transition-all"
+                className="group flex items-center justify-between p-3.5 rounded-2xl bg-white border-3 border-black font-black text-slate-950 shadow-[3px_3px_0px_0px_#000] hover:bg-emerald-100 hover:translate-x-1 transition-all cursor-pointer"
               >
-                <div className="w-9 h-9 rounded-xl bg-emerald-400 border-2 border-black flex items-center justify-center shrink-0">
-                  <Phone className="w-5 h-5 text-black" />
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-400 border-2 border-black flex items-center justify-center shrink-0 shadow-[1.5px_1.5px_0px_0px_#000]">
+                    <Phone className="w-5 h-5 text-black" />
+                  </div>
+                  <div className="truncate">
+                    <span className="block text-[10px] text-slate-600 uppercase font-black tracking-wider">Layanan Interaktif</span>
+                    <span className="text-slate-950 font-black text-xs sm:text-sm">Hubungi Kami via WhatsApp</span>
+                  </div>
                 </div>
-                <div className="truncate">
-                  <span className="block text-[10px] text-slate-600 uppercase font-black">WhatsApp Resmi</span>
-                  <span className="text-slate-950 font-black">+62 812-3456-7890</span>
+                <div className="w-8 h-8 rounded-xl bg-emerald-200 border-2 border-black flex items-center justify-center shrink-0 group-hover:bg-emerald-300 group-hover:translate-x-0.5 transition-all shadow-[1.5px_1.5px_0px_0px_#000]">
+                  <ArrowRight className="w-4 h-4 text-black" />
                 </div>
               </a>
 
+              {/* Email Card */}
               <a
                 href={`mailto:${OFFICIAL_EMAIL}`}
-                className="flex items-center gap-3 p-3.5 rounded-2xl bg-white border-3 border-black font-black text-xs sm:text-sm text-slate-950 shadow-[3px_3px_0px_0px_#000] hover:bg-cyan-100 hover:translate-x-1 transition-all"
+                className="group flex items-center gap-3 p-3.5 rounded-2xl bg-white border-3 border-black font-black text-slate-950 shadow-[3px_3px_0px_0px_#000] hover:bg-cyan-100 hover:translate-x-1 transition-all cursor-pointer"
               >
-                <div className="w-9 h-9 rounded-xl bg-cyan-400 border-2 border-black flex items-center justify-center shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-cyan-400 border-2 border-black flex items-center justify-center shrink-0 shadow-[1.5px_1.5px_0px_0px_#000]">
                   <Mail className="w-5 h-5 text-black" />
                 </div>
-                <div className="truncate">
-                  <span className="block text-[10px] text-slate-600 uppercase font-black">Email Sekretariat</span>
-                  <span className="text-slate-950 font-black truncate block">{OFFICIAL_EMAIL}</span>
+                <div className="truncate min-w-0">
+                  <span className="block text-[10px] text-slate-600 uppercase font-black tracking-wider">Email Sekretariat</span>
+                  <span className="text-slate-950 font-black truncate block text-xs sm:text-sm">{OFFICIAL_EMAIL}</span>
                 </div>
               </a>
 
+              {/* Instagram Card */}
               <a
                 href={OFFICIAL_IG_URL}
                 target="_blank"
                 rel="noreferrer"
-                className="flex items-center gap-3 p-3.5 rounded-2xl bg-white border-3 border-black font-black text-xs sm:text-sm text-slate-950 shadow-[3px_3px_0px_0px_#000] hover:bg-rose-100 hover:translate-x-1 transition-all"
+                className="group flex items-center gap-3 p-3.5 rounded-2xl bg-white border-3 border-black font-black text-slate-950 shadow-[3px_3px_0px_0px_#000] hover:bg-rose-100 hover:translate-x-1 transition-all cursor-pointer"
               >
-                <div className="w-9 h-9 rounded-xl bg-rose-400 border-2 border-black flex items-center justify-center shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-rose-400 border-2 border-black flex items-center justify-center shrink-0 shadow-[1.5px_1.5px_0px_0px_#000]">
                   <InstagramIcon className="w-5 h-5 text-black" />
                 </div>
-                <div className="truncate">
-                  <span className="block text-[10px] text-slate-600 uppercase font-black">Instagram Resmi</span>
-                  <span className="text-slate-950 font-black">@san.tasikmalaya.2020</span>
+                <div className="truncate min-w-0">
+                  <span className="block text-[10px] text-slate-600 uppercase font-black tracking-wider">Instagram Resmi</span>
+                  <span className="text-slate-950 font-black text-xs sm:text-sm">@san.tasikmalaya.2020</span>
                 </div>
               </a>
             </div>
           </div>
 
-          <div className="bg-white border-3 border-black rounded-2xl p-4 shadow-[4px_4px_0px_0px_#000] flex items-center gap-3">
+          {/* Activity / Coverage Area Card */}
+          <div className="bg-white border-3 border-black rounded-2xl p-4 shadow-[4px_4px_0px_0px_#000] flex items-center gap-3.5">
             <div className="w-10 h-10 rounded-xl bg-amber-400 border-2 border-black flex items-center justify-center shrink-0 shadow-[2px_2px_0px_0px_#000]">
               <MapPin className="w-5 h-5 text-black" />
             </div>
             <div>
-              <span className="text-xs font-black text-slate-950 block">Wilayah Pengabdian & Kegiatan</span>
-              <span className="text-[11px] font-extrabold text-slate-700">Kota & Kabupaten Tasikmalaya, Jawa Barat</span>
+              <span className="text-[11px] font-black text-slate-700 uppercase tracking-wider block">
+                Wilayah Pengabdian & Kegiatan
+              </span>
+              <span className="text-xs sm:text-sm font-black text-slate-950 block">
+                Kota & Kabupaten Tasikmalaya, Jawa Barat
+              </span>
             </div>
           </div>
         </div>
@@ -193,7 +214,7 @@ export function ContactWidget() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {/* Name Input */}
+                  {/* Nama Lengkap Input */}
                   <div className="space-y-1.5">
                     <label style={{ color: '#000000' }} className="block text-xs font-black uppercase tracking-wider text-black">
                       Nama Lengkap <span className="text-rose-600">*</span>
@@ -203,12 +224,12 @@ export function ContactWidget() {
                       required
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      placeholder="e.g. Budi Gunawan"
+                      placeholder="Misal: Budi Gunawan"
                       className="w-full px-3.5 py-2.5 rounded-xl border-2 border-black font-extrabold text-slate-950 placeholder:text-slate-400 bg-amber-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-400 transition-all text-sm"
                     />
                   </div>
 
-                  {/* WhatsApp Input */}
+                  {/* Nomor WhatsApp Input */}
                   <div className="space-y-1.5">
                     <label style={{ color: '#000000' }} className="block text-xs font-black uppercase tracking-wider text-black">
                       Nomor WhatsApp <span className="text-rose-600">*</span>
@@ -218,27 +239,27 @@ export function ContactWidget() {
                       required
                       value={formData.whatsapp}
                       onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
-                      placeholder="e.g. 081234567890"
+                      placeholder="Misal: 081234567890"
                       className="w-full px-3.5 py-2.5 rounded-xl border-2 border-black font-extrabold text-slate-950 placeholder:text-slate-400 bg-amber-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-400 transition-all text-sm"
                     />
                   </div>
                 </div>
 
-                {/* Email Input */}
+                {/* Alamat Email (Opsi) Input */}
                 <div className="space-y-1.5">
                   <label style={{ color: '#000000' }} className="block text-xs font-black uppercase tracking-wider text-black">
-                    Alamat Email (Opsional)
+                    Alamat Email (Opsi)
                   </label>
                   <input
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    placeholder="e.g. budi@gmail.com"
+                    placeholder="Misal: budi@gmail.com"
                     className="w-full px-3.5 py-2.5 rounded-xl border-2 border-black font-extrabold text-slate-950 placeholder:text-slate-400 bg-amber-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-400 transition-all text-sm"
                   />
                 </div>
 
-                {/* Message Input */}
+                {/* Pesan / Pertanyaan / Ajakan Kolaborasi Input */}
                 <div className="space-y-1.5">
                   <label style={{ color: '#000000' }} className="block text-xs font-black uppercase tracking-wider text-black">
                     Pesan / Pertanyaan / Ajakan Kolaborasi <span className="text-rose-600">*</span>
@@ -248,26 +269,25 @@ export function ContactWidget() {
                     rows={4}
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    placeholder="Tuliskan pesan atau kebutuhan kerja sama Anda secara detail..."
+                    placeholder="Tuliskan pesan, pertanyaan, atau rincian ajakan kolaborasi Anda di sini..."
                     className="w-full px-3.5 py-2.5 rounded-xl border-2 border-black font-bold text-slate-950 placeholder:text-slate-400 bg-amber-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-400 transition-all text-sm leading-relaxed"
                   />
                 </div>
 
-                {/* Submit Action */}
-                <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <span className="text-[11px] font-extrabold text-slate-600 flex items-center gap-1">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 inline shrink-0" />
-                    Data Anda aman & tidak dipublikasikan ke publik.
+                {/* Submit Action: Prominently Styled Kirim Pesan WhatsApp Button */}
+                <div className="pt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <span className="text-[11px] font-extrabold text-slate-600 flex items-center gap-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 inline shrink-0" />
+                    Data langsung terkirim secara aman via enkripsi chat WhatsApp.
                   </span>
 
-                  <RetroButton
+                  <button
                     type="submit"
-                    variant="primary"
-                    size="md"
-                    className="font-black text-black"
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-2xl bg-emerald-400 hover:bg-emerald-300 active:bg-emerald-500 border-3 border-black text-black font-black text-sm sm:text-base shadow-[4px_4px_0px_0px_#000] hover:shadow-[5px_5px_0px_0px_#000] hover:-translate-y-0.5 active:translate-x-1 active:translate-y-1 active:shadow-[1px_1px_0px_0px_#000] transition-all cursor-pointer shrink-0"
                   >
-                    <Send className="w-4 h-4 text-black shrink-0" /> Kirim Pesan WhatsApp
-                  </RetroButton>
+                    <Send className="w-5 h-5 text-black shrink-0" />
+                    <span>Kirim Pesan WhatsApp</span>
+                  </button>
                 </div>
               </form>
             )}
@@ -277,3 +297,4 @@ export function ContactWidget() {
     </section>
   );
 }
+
