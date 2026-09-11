@@ -14,12 +14,12 @@ export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const publicNavLinks = [
-    { name: 'Berita & Artikel', href: '/berita', icon: FileText },
+    { name: 'Berita & Warta', href: '/berita', icon: FileText },
     { name: 'Direktori Anggota', href: '/anggota', icon: Users },
   ];
 
   return (
-    <header className="sticky top-0 z-50 bg-amber-50/90 backdrop-blur-md border-b-3 border-black py-3 px-4 md:px-8">
+    <header className="sticky top-0 z-50 bg-amber-50 border-b-3 border-black py-3 px-4 md:px-8 shadow-none">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Brand Logo */}
         <Link href="/" className="group flex items-center gap-2.5 sm:gap-3">

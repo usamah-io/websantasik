@@ -46,5 +46,6 @@ export async function uploadImageToCloudinary(fileBuffer: Buffer | string, filen
     return fileBuffer;
   }
   
-  return 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=800&auto=format&fit=crop';
+  return '/images/san-activity.jpg';
 }
+

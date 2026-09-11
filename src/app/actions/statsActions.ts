@@ -11,8 +11,8 @@ export async function getAdminRealtimeStats() {
   await requireSuperAdminSession();
 
   let totalViews = 1248;
-  let totalNews = 3;
-  let totalMembers = 6;
+  let totalNews = 0;
+  let totalMembers = 0;
   let activeAdmins: Array<{ email: string; name: string; role: string; lastIp: string; lastLogin: string }> = [
     {
       email: 'admin@santasikmalaya.org',
@@ -33,17 +33,22 @@ export async function getAdminRealtimeStats() {
   try {
     await connectToDatabase();
     const viewsAgg = await News.aggregate([
+      { $match: { slug: { $nin: ['festival-seni-budaya-san-tasikmalaya-2026', 'musyawarah-anggota-pemilihan-ketua-umum', 'aksi-kebersihan-penanaman-pohon-galunggung'] } } },
       { $group: { _id: null, total: { $sum: '$views' } } },
     ]);
     if (viewsAgg && viewsAgg.length > 0 && viewsAgg[0].total > 0) {
       totalViews = viewsAgg[0].total + 1200;
     }
 
-    const newsCount = await News.countDocuments();
-    if (newsCount > 0) totalNews = newsCount;
+    const newsCount = await News.countDocuments({
+      slug: { $nin: ['festival-seni-budaya-san-tasikmalaya-2026', 'musyawarah-anggota-pemilihan-ketua-umum', 'aksi-kebersihan-penanaman-pohon-galunggung'] },
+    });
+    totalNews = newsCount;
 
-    const memberCount = await Member.countDocuments();
-    if (memberCount > 0) totalMembers = memberCount;
+    const memberCount = await Member.countDocuments({
+      name: { $nin: ['Salman Al Farisi', 'M. Wildan Febrian', 'Siti Rahmawati', 'Rian Hidayat', 'Nabila Putri', 'Agus Setiawan', 'Farhan Permana', 'Dadan Hamdani'] },
+    });
+    totalMembers = memberCount;
 
     const dbUsers = await User.find({ isWhitelisted: true }).sort({ lastLoginAt: -1 }).limit(10).lean();
     if (dbUsers && dbUsers.length > 0) {

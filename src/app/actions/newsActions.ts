@@ -8,59 +8,35 @@ import { recordAuditLog } from '@/lib/audit';
 import { requireAdminSession } from '@/lib/auth';
 import { convertGoogleDriveUrl } from '@/lib/imageUtils';
 
-const initialNews = [
-  {
-    id: 'news-1',
-    title: 'Festival Seni & Budaya San Tasikmalaya 2026 Segera Digelar!',
-    slug: 'festival-seni-budaya-san-tasikmalaya-2026',
-    summary: 'Ajang selebrasi kreativitas pemuda dan kebudayaan lokal Tasikmalaya menghadirkan musisi lokal dan pertunjukan teater.',
-    content: `Festival Seni & Budaya San Tasikmalaya 2026 siap digelar bulan depan! Acara tahunan ini bertujuan melestarikan seni khas Priangan Timur sekaligus wadah berekspresi bagi generasi muda Tasikmalaya.\n\nDalam acara ini akan disajikan pameran kerajinan rajapolah, pentas tari kliningan, live painting, hingga bazar UMKM kuliner legendaris Nasi Tutug Oncom.`,
-    category: 'Kegiatan',
-    imageUrl: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&auto=format&fit=crop',
-    images: [
-      'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&auto=format&fit=crop',
-    ],
-    author: 'Humas San Tasik',
-    views: 432,
-    createdAt: new Date('2026-08-15').toISOString(),
-  },
-  {
-    id: 'news-2',
-    title: 'Musyawarah Anggota & Pemilihan Ketua Umum Periode 2026-2028',
-    slug: 'musyawarah-anggota-pemilihan-ketua-umum',
-    summary: 'Proses demokrasi organisasi berjalan khidmat dengan semangat kekeluargaan dan gotong royong.',
-    content: `San Tasikmalaya sukses menggelar Musyawarah Anggota untuk mengevaluasi laporan pertanggungjawaban kepengurusan lalu serta merumuskan garis besar haluan organisasi untuk dua tahun mendatang.\n\nSelamat kepada kepengurusan baru yang terpilih, mari bergerak bersama memajukan daerah!`,
-    category: 'Organisasi',
-    imageUrl: 'https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=800&auto=format&fit=crop',
-    images: [
-      'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&auto=format&fit=crop',
-    ],
-    author: 'Sekretariat',
-    views: 289,
-    createdAt: new Date('2026-08-28').toISOString(),
-  },
-  {
-    id: 'news-3',
-    title: 'Aksi Sosialisasi Kebersihan Lingkungan & Penanaman Pohon di Gunung Galunggung',
-    slug: 'aksi-kebersihan-penanaman-pohon-galunggung',
-    summary: 'Kolaborasi komunitas kepemudaan Tasikmalaya menjaga kelestarian alam dan ekosistem hijau.',
-    content: `Sebanyak 50 relawan San Tasikmalaya turun langsung melakukan penanaman bibit pohon endemik di kaki Gunung Galunggung. Kegiatan ini diiringi edukasi pemilahan sampah organik dan anorganik kepada wisatawan lokal.`,
-    category: 'Sosial',
-    imageUrl: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800&auto=format&fit=crop',
-    images: [
-      'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&auto=format&fit=crop',
-    ],
-    author: 'Divisi Lingkungan',
-    views: 195,
-    createdAt: new Date('2026-09-02').toISOString(),
-  },
+const FALLBACK_IMAGE_URL = '/images/san-activity.jpg';
+const DUMMY_SLUGS = [
+  'festival-seni-budaya-san-tasikmalaya-2026',
+  'musyawarah-anggota-pemilihan-ketua-umum',
+  'aksi-kebersihan-penanaman-pohon-galunggung',
 ];
+
+const initialNews: Array<{
+  id: string;
+  title: string;
+  slug: string;
+  summary: string;
+  content: string;
+  category: string;
+  imageUrl?: string;
+  images?: string[];
+  author: string;
+  views: number;
+  createdAt: string;
+}> = [];
 
 export async function getNewsList(query?: string, category?: string) {
   try {
     await connectToDatabase();
-    const filter: any = { isPublished: true };
+    try {
+      await News.deleteMany({ slug: { $in: DUMMY_SLUGS } });
+    } catch {}
+
+    const filter: any = { isPublished: true, slug: { $nin: DUMMY_SLUGS } };
 
     if (category && category !== 'Semua') {
       filter.category = category;
@@ -73,7 +49,7 @@ export async function getNewsList(query?: string, category?: string) {
 
     const newsDocs = await News.find(filter).sort({ createdAt: -1 }).lean();
 
-    if (newsDocs && newsDocs.length > 0) {
+    if (newsDocs) {
       return newsDocs.map((doc: any) => ({
         id: doc._id.toString(),
         title: doc.title,
@@ -81,12 +57,12 @@ export async function getNewsList(query?: string, category?: string) {
         summary: doc.summary,
         content: doc.content,
         category: doc.category,
-        imageUrl: convertGoogleDriveUrl(doc.imageUrl) || 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&auto=format&fit=crop',
+        imageUrl: convertGoogleDriveUrl(doc.imageUrl) || FALLBACK_IMAGE_URL,
         images: Array.isArray(doc.images)
           ? doc.images.map((url: string) => convertGoogleDriveUrl(url)).filter(Boolean)
           : [],
         author: doc.author,
-        views: doc.views,
+        views: doc.views || 0,
         createdAt: doc.createdAt ? new Date(doc.createdAt).toISOString() : new Date().toISOString(),
       }));
     }
@@ -107,7 +83,7 @@ export async function getNewsList(query?: string, category?: string) {
 
   return filtered.map((item) => ({
     ...item,
-    imageUrl: convertGoogleDriveUrl(item.imageUrl),
+    imageUrl: convertGoogleDriveUrl(item.imageUrl) || FALLBACK_IMAGE_URL,
     images: (item.images || []).map((url) => convertGoogleDriveUrl(url)).filter(Boolean),
   }));
 }
@@ -115,12 +91,16 @@ export async function getNewsList(query?: string, category?: string) {
 export async function getLatestNews(limit: number = 3) {
   try {
     await connectToDatabase();
-    const newsDocs = await News.find({ isPublished: true })
+    try {
+      await News.deleteMany({ slug: { $in: DUMMY_SLUGS } });
+    } catch {}
+
+    const newsDocs = await News.find({ isPublished: true, slug: { $nin: DUMMY_SLUGS } })
       .sort({ createdAt: -1 })
       .limit(limit)
       .lean();
 
-    if (newsDocs && newsDocs.length > 0) {
+    if (newsDocs) {
       return newsDocs.map((doc: any) => ({
         id: doc._id.toString(),
         title: doc.title,
@@ -128,12 +108,12 @@ export async function getLatestNews(limit: number = 3) {
         summary: doc.summary,
         content: doc.content,
         category: doc.category,
-        imageUrl: convertGoogleDriveUrl(doc.imageUrl) || 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&auto=format&fit=crop',
+        imageUrl: convertGoogleDriveUrl(doc.imageUrl) || FALLBACK_IMAGE_URL,
         images: Array.isArray(doc.images)
           ? doc.images.map((url: string) => convertGoogleDriveUrl(url)).filter(Boolean)
           : [],
         author: doc.author,
-        views: doc.views,
+        views: doc.views || 0,
         createdAt: doc.createdAt ? new Date(doc.createdAt).toISOString() : new Date().toISOString(),
       }));
     }
@@ -143,12 +123,15 @@ export async function getLatestNews(limit: number = 3) {
 
   return initialNews.slice(0, limit).map((item) => ({
     ...item,
-    imageUrl: convertGoogleDriveUrl(item.imageUrl),
+    imageUrl: convertGoogleDriveUrl(item.imageUrl) || FALLBACK_IMAGE_URL,
     images: (item.images || []).map((url) => convertGoogleDriveUrl(url)).filter(Boolean),
   }));
 }
 
 export async function getNewsBySlug(slug: string) {
+  if (DUMMY_SLUGS.includes(slug)) {
+    return null;
+  }
   try {
     await connectToDatabase();
     const doc = await News.findOneAndUpdate({ slug }, { $inc: { views: 1 } }, { new: true }).lean();
@@ -160,12 +143,12 @@ export async function getNewsBySlug(slug: string) {
         summary: (doc as any).summary,
         content: (doc as any).content,
         category: (doc as any).category,
-        imageUrl: convertGoogleDriveUrl((doc as any).imageUrl) || 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&auto=format&fit=crop',
+        imageUrl: convertGoogleDriveUrl((doc as any).imageUrl) || FALLBACK_IMAGE_URL,
         images: Array.isArray((doc as any).images)
           ? (doc as any).images.map((url: string) => convertGoogleDriveUrl(url)).filter(Boolean)
           : [],
         author: (doc as any).author,
-        views: (doc as any).views,
+        views: (doc as any).views || 0,
         createdAt: (doc as any).createdAt ? new Date((doc as any).createdAt).toISOString() : new Date().toISOString(),
       };
     }
@@ -176,7 +159,7 @@ export async function getNewsBySlug(slug: string) {
     found.views += 1;
     return {
       ...found,
-      imageUrl: convertGoogleDriveUrl(found.imageUrl),
+      imageUrl: convertGoogleDriveUrl(found.imageUrl) || FALLBACK_IMAGE_URL,
       images: (found.images || []).map((url) => convertGoogleDriveUrl(url)).filter(Boolean),
     };
   }
@@ -202,7 +185,7 @@ export async function createNewsAction(formData: FormData) {
     return { success: false, error: 'Judul, ringkasan, dan isi berita wajib diisi.' };
   }
 
-  let finalImageUrl = 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&auto=format&fit=crop';
+  let finalImageUrl = FALLBACK_IMAGE_URL;
 
   if (imageFile && imageFile.size > 0 && imageFile.name) {
     const bytes = await imageFile.arrayBuffer();

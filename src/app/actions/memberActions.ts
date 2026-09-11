@@ -7,109 +7,37 @@ import { recordAuditLog } from '@/lib/audit';
 import { requireAdminSession } from '@/lib/auth';
 import { convertGoogleDriveUrl } from '@/lib/imageUtils';
 
-const initialMembers: any[] = [
-  {
-    id: 'mem-ketua',
-    name: 'Salman Al Farisi',
-    role: 'Ketua Chapter',
-    division: 'Ketua Chapter',
-    photoUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop',
-    bio: 'Memimpin & mengabdi untuk kemajuan dan senyuman generasi pemuda Tasikmalaya.',
-    email: 'salman@santasikmalaya.org',
-    instagram: '@salman_alfarisi',
-    linkedin: 'salman-al-farisi',
-    order: 1,
-  },
-  {
-    id: 'mem-1',
-    name: 'M. Wildan Febrian',
-    role: 'Kepala Divisi PSDM',
-    division: 'Divisi PSDM',
-    photoUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&auto=format&fit=crop',
-    bio: 'Memfasilitasi pelatihan kepemimpinan & workshop skill anggota.',
-    email: 'wildan@santasikmalaya.org',
-    instagram: '@wildan_feb',
-    linkedin: 'wildan-febrian',
-    order: 2,
-  },
-  {
-    id: 'mem-2',
-    name: 'Siti Rahmawati',
-    role: 'Staff Divisi PSDM',
-    division: 'Divisi PSDM',
-    photoUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&auto=format&fit=crop',
-    bio: 'Pengelola pendampingan kader dan kaderisasi anggota.',
-    email: 'rahma@santasikmalaya.org',
-    instagram: '@siti_rahma',
-    linkedin: 'siti-rahmawati',
-    order: 3,
-  },
-  {
-    id: 'mem-3',
-    name: 'Rian Hidayat',
-    role: 'Kepala Divisi Kominfo',
-    division: 'Divisi Kominfo',
-    photoUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&auto=format&fit=crop',
-    bio: 'Kreator konten & pengelola strategi komunikasi publik San Tasik.',
-    email: 'rian@santasikmalaya.org',
-    instagram: '@rian_hidayat',
-    linkedin: 'rian-hidayat',
-    order: 4,
-  },
-  {
-    id: 'mem-4',
-    name: 'Nabila Putri',
-    role: 'Staff Divisi Kominfo',
-    division: 'Divisi Kominfo',
-    photoUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&auto=format&fit=crop',
-    bio: 'Spesialis desainer grafis dan kurator media sosial.',
-    email: 'nabila@santasikmalaya.org',
-    instagram: '@nabila_ptr',
-    linkedin: 'nabila-putri',
-    order: 5,
-  },
-  {
-    id: 'mem-5',
-    name: 'Agus Setiawan',
-    role: 'Kepala Divisi Rensos',
-    division: 'Divisi Rensos',
-    photoUrl: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=400&auto=format&fit=crop',
-    bio: 'Koordinator aksi tanggap sosial dan bakti masyarakat Priangan.',
-    email: 'agus@santasikmalaya.org',
-    instagram: '@agus_setia',
-    linkedin: 'agus-setiawan',
-    order: 6,
-  },
-  {
-    id: 'mem-6',
-    name: 'Farhan Permana',
-    role: 'Staff Divisi Rensos',
-    division: 'Divisi Rensos',
-    photoUrl: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&auto=format&fit=crop',
-    bio: 'Pelaksana perencanaan program bakti sosial berkala.',
-    email: 'farhan@santasikmalaya.org',
-    instagram: '@farhan_perm',
-    linkedin: 'farhan-permana',
-    order: 7,
-  },
-  {
-    id: 'mem-7',
-    name: 'Dadan Hamdani',
-    role: 'Steering Committee',
-    division: 'Divisi SC',
-    photoUrl: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&auto=format&fit=crop',
-    bio: 'Pembina & pengarah strategis keorganisasian San Chapter Tasikmalaya.',
-    email: 'dadan@santasikmalaya.org',
-    instagram: '@dadan_hamdani',
-    linkedin: 'dadan-hamdani',
-    order: 8,
-  },
+const FALLBACK_PHOTO_URL = '/images/san-activity.jpg';
+const DUMMY_MEMBER_NAMES = [
+  'Salman Al Farisi',
+  'M. Wildan Febrian',
+  'Siti Rahmawati',
+  'Rian Hidayat',
+  'Nabila Putri',
+  'Agus Setiawan',
+  'Farhan Permana',
+  'Dadan Hamdani',
 ];
+
+const initialMembers: any[] = [];
 
 export async function getMembersList(division?: string) {
   try {
     await connectToDatabase();
-    const filter: any = {};
+
+    // Clean up any residual dummy members from previous seed
+    try {
+      await Member.deleteMany({
+        $or: [
+          { name: { $in: DUMMY_MEMBER_NAMES } },
+          { email: { $regex: /@santasikmalaya\.org$/i } },
+        ],
+      });
+    } catch {}
+
+    const filter: any = {
+      name: { $nin: DUMMY_MEMBER_NAMES },
+    };
     if (division && division !== 'Semua') {
       filter.division = division;
     }
@@ -122,7 +50,7 @@ export async function getMembersList(division?: string) {
         name: doc.name,
         role: doc.role,
         division: doc.division,
-        photoUrl: convertGoogleDriveUrl(doc.photoUrl) || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400',
+        photoUrl: convertGoogleDriveUrl(doc.photoUrl) || FALLBACK_PHOTO_URL,
         bio: doc.bio || '',
         email: doc.email || '',
         instagram: doc.instagram || '',
@@ -132,8 +60,10 @@ export async function getMembersList(division?: string) {
         order: doc.order || 0,
       }));
     }
+
+    return [];
   } catch (err) {
-    console.warn('DB error, using fallback members:', (err as Error).message);
+    console.warn('DB error in getMembersList:', (err as Error).message);
   }
 
   let filtered = [...initialMembers];
@@ -143,7 +73,7 @@ export async function getMembersList(division?: string) {
 
   return filtered.map((item) => ({
     ...item,
-    photoUrl: convertGoogleDriveUrl(item.photoUrl),
+    photoUrl: convertGoogleDriveUrl(item.photoUrl) || FALLBACK_PHOTO_URL,
     imagePosition: (item as any).imagePosition || 'object-center',
   }));
 }
@@ -165,7 +95,7 @@ export async function createMemberAction(formData: FormData) {
     return { success: false, error: 'Nama dan jabatan/role wajib diisi.' };
   }
 
-  const finalPhotoUrl = convertGoogleDriveUrl(photoUrlInput) || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400';
+  const finalPhotoUrl = convertGoogleDriveUrl(photoUrlInput) || FALLBACK_PHOTO_URL;
   let createdId = 'mem-' + Date.now();
 
   try {
@@ -214,6 +144,7 @@ export async function createMemberAction(formData: FormData) {
     });
   }
 
+  revalidatePath('/');
   revalidatePath('/anggota');
   revalidatePath('/admin/anggota');
 
@@ -238,7 +169,7 @@ export async function updateMemberAction(formData: FormData) {
     return { success: false, error: 'ID, Nama, dan Jabatan wajib diisi.' };
   }
 
-  const finalPhotoUrl = convertGoogleDriveUrl(photoUrlInput) || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400';
+  const finalPhotoUrl = convertGoogleDriveUrl(photoUrlInput) || FALLBACK_PHOTO_URL;
 
   try {
     await connectToDatabase();
@@ -279,6 +210,7 @@ export async function updateMemberAction(formData: FormData) {
     }
   }
 
+  revalidatePath('/');
   revalidatePath('/anggota');
   revalidatePath('/admin/anggota');
 
@@ -302,6 +234,7 @@ export async function deleteMemberAction(id: string) {
   const index = initialMembers.findIndex((m) => m.id === id);
   if (index !== -1) initialMembers.splice(index, 1);
 
+  revalidatePath('/');
   revalidatePath('/anggota');
   revalidatePath('/admin/anggota');
 

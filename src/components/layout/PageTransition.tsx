@@ -20,19 +20,6 @@ export function PageTransition({ children }: PageTransitionProps) {
 
   return (
     <>
-      {/* Top Route Progress Glow Bar */}
-      <motion.div
-        key={`progress-${pathname}`}
-        initial={{ scaleX: 0, opacity: 1 }}
-        animate={{ scaleX: 1, opacity: [1, 1, 0] }}
-        transition={{
-          scaleX: { duration: 0.75, ease: easeInOutCubic },
-          opacity: { duration: 0.3, delay: 0.6, ease: 'easeOut' },
-        }}
-        style={{ originX: 0 }}
-        className="fixed top-0 left-0 right-0 h-[3.5px] bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 z-[10000] pointer-events-none shadow-[0_2px_8px_rgba(245,158,11,0.7)]"
-      />
-
       {/* Fluid Color-Slide Curtain 1: Dark Slate */}
       <motion.div
         key={`curtain-dark-${pathname}`}
@@ -43,7 +30,7 @@ export function PageTransition({ children }: PageTransitionProps) {
           times: [0, 0.48, 1],
           ease: easeInOutCubic,
         }}
-        className="fixed inset-0 bg-slate-950 z-[9999] pointer-events-none rounded-t-[32px] md:rounded-t-[48px] rounded-b-[32px] md:rounded-b-[48px] border-y-4 border-black shadow-[0_12px_24px_rgba(0,0,0,0.5)] flex items-center justify-center"
+        className="fixed inset-0 bg-slate-950 z-[9999] pointer-events-none rounded-t-[32px] md:rounded-t-[48px] rounded-b-[32px] md:rounded-b-[48px] border-y-4 border-black shadow-none flex items-center justify-center"
       >
         <motion.div
           initial={{ opacity: 0, scale: 0.92 }}
@@ -71,7 +58,7 @@ export function PageTransition({ children }: PageTransitionProps) {
           ease: easeInOutCubic,
           delay: 0.05,
         }}
-        className="fixed inset-0 bg-amber-400 z-[9998] pointer-events-none rounded-t-[32px] md:rounded-t-[48px] rounded-b-[32px] md:rounded-b-[48px] border-y-4 border-black shadow-[0_16px_32px_rgba(0,0,0,0.4)]"
+        className="fixed inset-0 bg-amber-400 z-[9998] pointer-events-none rounded-t-[32px] md:rounded-t-[48px] rounded-b-[32px] md:rounded-b-[48px] border-y-4 border-black shadow-none"
       />
 
       {/* Page Content with Graceful Easing & Smooth Glide */}

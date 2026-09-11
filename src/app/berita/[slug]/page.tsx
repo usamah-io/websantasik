@@ -8,7 +8,7 @@ import { ArrowLeft, Calendar, Eye, User, Share2, Camera } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
-const FALLBACK_NEWS_IMAGE = 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&auto=format&fit=crop';
+const FALLBACK_NEWS_IMAGE = '/images/san-activity.jpg';
 
 export default async function NewsDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -109,10 +109,10 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ slu
 
         <div className="pt-6 border-t-2 border-slate-200 flex items-center justify-between">
           <span className="text-xs font-black text-slate-500 uppercase tracking-wider">
-            San Tasikmalaya Official Article
+            Warta Berita Resmi San Chapter Tasikmalaya
           </span>
           <RetroButton variant="accent" size="sm">
-            <Share2 className="w-3.5 h-3.5" /> Bagikan Artikel
+            <Share2 className="w-3.5 h-3.5" /> Bagikan Berita
           </RetroButton>
         </div>
       </RetroCard>

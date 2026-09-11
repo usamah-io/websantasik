@@ -126,7 +126,7 @@ export default function AdminAnggotaPage() {
                   name="name"
                   required
                   defaultValue={editingMember?.name || ''}
-                  placeholder="Misal: Salman Al Farisi"
+                  placeholder="Misal: Ahmad Fauzi"
                   className="w-full px-3.5 py-2.5 rounded-xl border-2 border-black font-extrabold bg-white text-slate-950 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400"
                 />
               </div>
@@ -179,11 +179,11 @@ export default function AdminAnggotaPage() {
                 <div className="flex items-center gap-4">
                   <div className="w-20 h-20 rounded-2xl border-2 border-black overflow-hidden shadow-[3px_3px_0px_0px_#000] bg-white shrink-0 relative">
                     <img
-                      src={photoUrlInput || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400'}
+                      src={photoUrlInput || '/images/san-activity.jpg'}
                       alt="Preview Avatar"
                       className={`w-full h-full object-cover ${imagePos}`}
                       onError={(e) => {
-                        e.currentTarget.src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400';
+                        e.currentTarget.src = '/images/san-activity.jpg';
                       }}
                     />
                   </div>
@@ -297,6 +297,16 @@ export default function AdminAnggotaPage() {
 
         {loading ? (
           <p className="text-center py-8 font-bold text-slate-600">Memuat pengurus...</p>
+        ) : members.length === 0 ? (
+          <div className="text-center py-12 space-y-3">
+            <div className="w-12 h-12 rounded-2xl bg-amber-100 border-2 border-black flex items-center justify-center mx-auto shadow-[2px_2px_0px_0px_#000]">
+              <Users className="w-6 h-6 text-slate-950" />
+            </div>
+            <h4 className="font-black text-slate-950 text-base">Belum Ada Data Pengurus</h4>
+            <p className="text-xs font-bold text-slate-600 max-w-sm mx-auto">
+              Silakan klik tombol &quot;Tambah Pengurus Baru&quot; di atas untuk menambahkan pengurus pertama.
+            </p>
+          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {members.map((member) => (

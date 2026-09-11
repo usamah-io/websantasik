@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/Badge';
 import { getNewsList } from '@/app/actions/newsActions';
 import { Search, Eye, Calendar, User, FileText, Filter, ArrowRight } from 'lucide-react';
 
-const FALLBACK_NEWS_IMAGE = 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&auto=format&fit=crop';
+const FALLBACK_NEWS_IMAGE = '/images/san-activity.jpg';
 
 export default function NewsPage() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -89,10 +89,16 @@ export default function NewsPage() {
         </div>
       ) : articles.length === 0 ? (
         <div className="bg-white border-3 border-black rounded-3xl p-12 text-center space-y-4 shadow-[4px_4px_0px_0px_#000]">
-          <FileText className="w-12 h-12 text-slate-400 mx-auto" />
-          <h3 className="text-xl font-black text-slate-950">Berita tidak ditemukan</h3>
-          <p className="text-sm font-bold text-slate-700">
-            Coba kata kunci lain atau pilih kategori &quot;Semua&quot;.
+          <div className="w-14 h-14 rounded-2xl bg-amber-100 border-2 border-black flex items-center justify-center mx-auto shadow-[2px_2px_0px_0px_#000]">
+            <FileText className="w-7 h-7 text-slate-950" />
+          </div>
+          <h3 className="text-xl font-black text-slate-950">
+            {searchQuery || selectedCategory !== 'Semua' ? 'Berita Tidak Ditemukan' : 'Belum Ada Warta Berita'}
+          </h3>
+          <p className="text-sm font-bold text-slate-700 max-w-md mx-auto">
+            {searchQuery || selectedCategory !== 'Semua'
+              ? 'Coba kata kunci lain atau pilih kategori "Semua".'
+              : 'Belum ada warta berita yang dipublikasikan oleh tim redaksi San Chapter Tasikmalaya.'}
           </p>
         </div>
       ) : (

@@ -28,17 +28,22 @@ export default async function AdminDashboardPage() {
 
   let totalViews = 2480;
   let totalMembers = 8;
-  let totalNews = 3;
+  let totalNews = 0;
   let auditLogsCount = 25;
 
   try {
     await connectToDatabase();
-    const viewsAgg = await News.aggregate([{ $group: { _id: null, total: { $sum: '$views' } } }]);
+    const viewsAgg = await News.aggregate([
+      { $match: { slug: { $nin: ['festival-seni-budaya-san-tasikmalaya-2026', 'musyawarah-anggota-pemilihan-ketua-umum', 'aksi-kebersihan-penanaman-pohon-galunggung'] } } },
+      { $group: { _id: null, total: { $sum: '$views' } } },
+    ]);
     if (viewsAgg && viewsAgg.length > 0 && viewsAgg[0].total > 0) {
       totalViews = viewsAgg[0].total + 1800;
     }
-    const newsCount = await News.countDocuments();
-    if (newsCount > 0) totalNews = newsCount;
+    const newsCount = await News.countDocuments({
+      slug: { $nin: ['festival-seni-budaya-san-tasikmalaya-2026', 'musyawarah-anggota-pemilihan-ketua-umum', 'aksi-kebersihan-penanaman-pohon-galunggung'] },
+    });
+    totalNews = newsCount;
 
     const membersCount = await Member.countDocuments();
     if (membersCount > 0) totalMembers = membersCount;

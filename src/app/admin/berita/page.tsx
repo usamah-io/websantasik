@@ -8,7 +8,7 @@ import { getNewsList, createNewsAction, updateNewsAction, deleteNewsAction } fro
 import Link from 'next/link';
 import { Newspaper, Plus, Trash2, ArrowLeft, Eye, Pencil, Image as ImageIcon, X } from 'lucide-react';
 
-const FALLBACK_NEWS_IMAGE = 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&auto=format&fit=crop';
+const FALLBACK_NEWS_IMAGE = '/images/san-activity.jpg';
 
 export default function AdminBeritaPage() {
   const [articles, setArticles] = useState<any[]>([]);

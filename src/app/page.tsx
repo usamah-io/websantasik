@@ -7,6 +7,8 @@ import { RetroButton } from '@/components/ui/RetroButton';
 import { RetroCard } from '@/components/ui/RetroCard';
 import { Badge } from '@/components/ui/Badge';
 import { HeroSlideshow, GalleryPhoto } from '@/components/landing/HeroSlideshow';
+import { MemberCarousel } from '@/components/landing/MemberCarousel';
+import { ContactWidget } from '@/components/landing/ContactWidget';
 import { getGalleryPhotos } from '@/app/actions/galleryActions';
 import { getLatestNews } from '@/app/actions/newsActions';
 import {
@@ -23,7 +25,7 @@ import {
   User,
 } from 'lucide-react';
 
-const FALLBACK_NEWS_IMAGE = 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&auto=format&fit=crop';
+const FALLBACK_NEWS_IMAGE = '/images/san-activity.jpg';
 
 export default function LandingPage() {
   const [photos, setPhotos] = useState<GalleryPhoto[]>([]);
@@ -39,12 +41,15 @@ export default function LandingPage() {
 
     getLatestNews(3)
       .then((data) => {
-        if (data && data.length > 0) {
+        if (data && Array.isArray(data)) {
           setLatestNews(data);
+        } else {
+          setLatestNews([]);
         }
       })
       .catch((err) => {
         console.warn('Failed to load latest news:', err);
+        setLatestNews([]);
       })
       .finally(() => {
         setLoadingNews(false);
@@ -206,6 +211,9 @@ export default function LandingPage() {
         </div>
       </motion.section>
 
+      {/* Member Swiper Carousel Section (Dynamic Profiles from MongoDB) */}
+      <MemberCarousel />
+
       {/* Featured News Teaser Section (Dynamic 3 Latest Articles directly from MongoDB) */}
       <section className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b-4 border-black pb-4">
@@ -215,7 +223,7 @@ export default function LandingPage() {
             </div>
             <div>
               <h2 style={{ color: '#000000' }} className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-black">
-                Artikel & Warta Organisasi
+                Berita & Warta Organisasi
               </h2>
               <p style={{ color: '#020617' }} className="text-xs sm:text-sm font-extrabold text-slate-950 mt-0.5">
                 Rilis berita, liputan kegiatan, dan dokumentasi terkini seputar SAN Chapter Tasikmalaya
@@ -248,12 +256,17 @@ export default function LandingPage() {
             ))}
           </div>
         ) : latestNews.length === 0 ? (
-          <RetroCard badgeBg="bg-white" className="p-8 text-center space-y-2 border-3">
-            <FileText className="w-10 h-10 text-slate-400 mx-auto" />
-            <p style={{ color: '#000000' }} className="font-black text-black text-base">
-              Belum ada warta berita yang dipublikasikan.
+          <div className="bg-white border-3 border-black rounded-3xl p-8 md:p-12 text-center space-y-3 shadow-[4px_4px_0px_0px_#000]">
+            <div className="w-14 h-14 rounded-2xl bg-amber-100 border-2 border-black flex items-center justify-center mx-auto shadow-[2px_2px_0px_0px_#000]">
+              <FileText className="w-7 h-7 text-black" />
+            </div>
+            <h3 style={{ color: '#000000' }} className="font-black text-black text-lg md:text-xl">
+              Belum Ada Warta Berita Dipublikasikan
+            </h3>
+            <p style={{ color: '#020617' }} className="text-xs md:text-sm font-bold text-slate-900 max-w-md mx-auto">
+              Artikel dan dokumentasi kegiatan resmi San Chapter Tasikmalaya akan segera hadir di sini setelah dirilis oleh tim redaksi.
             </p>
-          </RetroCard>
+          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {latestNews.map((article) => (
@@ -348,6 +361,9 @@ export default function LandingPage() {
           </div>
         )}
       </section>
+
+      {/* Interactive Neobrutalist Contact/Chat Widget */}
+      <ContactWidget />
     </div>
   );
 }

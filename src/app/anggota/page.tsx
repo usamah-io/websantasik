@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { RetroCard } from '@/components/ui/RetroCard';
 import { Badge } from '@/components/ui/Badge';
 import { getMembersList } from '@/app/actions/memberActions';
-import { Users, Camera, Share2, Mail, Crown, Award, MessageSquare, Check, Copy } from 'lucide-react';
+import { Users, Camera, Share2, Mail, Crown, Award, MessageSquare, Check } from 'lucide-react';
 
 export default function AnggotaPage() {
   const [selectedDivision, setSelectedDivision] = useState('Semua');
@@ -31,29 +31,15 @@ export default function AnggotaPage() {
     loadMembers();
   }, [selectedDivision]);
 
-  // Find Leader (Salman Al Farisi or member with role containing 'Ketua')
-  const leader =
-    members.find(
-      (m) =>
-        m.name.toLowerCase().includes('salman') ||
-        m.role.toLowerCase().includes('ketua')
-    ) || {
-      id: 'mem-ketua-default',
-      name: 'Salman Al Farisi',
-      role: 'Ketua Chapter',
-      division: 'Ketua Chapter',
-      photoUrl:
-        'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop',
-      imagePosition: 'object-center',
-      bio: 'Memimpin & mengabdi untuk kemajuan dan senyuman generasi pemuda Tasikmalaya.',
-      email: 'salman@santasikmalaya.org',
-      instagram: '@salman_alfarisi',
-      whatsapp: '081234567890',
-      linkedin: 'salman-al-farisi',
-    };
+  // Find Leader (member with role containing 'Ketua' or division 'Ketua')
+  const leader = members.find(
+    (m) =>
+      m.role?.toLowerCase().includes('ketua') ||
+      m.division?.toLowerCase().includes('ketua')
+  );
 
   // Exclude Leader from general grid to avoid duplication if present
-  const standardMembers = members.filter((m) => m.id !== leader.id);
+  const standardMembers = leader ? members.filter((m) => m.id !== leader.id) : members;
 
   const handleShareMember = (member: any) => {
     const textToCopy = `${member.name} - ${member.role} (${member.division}) San Chapter Tasikmalaya`;
@@ -95,100 +81,105 @@ export default function AnggotaPage() {
         </div>
       </div>
 
-      {/* Prominent Highlighted Leader Section (Ketua: Salman Al Farisi) */}
-      <motion.div
-        initial={{ opacity: 0, y: 15 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="relative rounded-3xl bg-gradient-to-br from-amber-300 via-amber-200 to-amber-400 border-4 border-black p-6 md:p-8 shadow-[8px_8px_0px_0px_#000] overflow-hidden"
-      >
-        <div className="absolute top-4 right-4 hidden sm:flex items-center gap-2 bg-white px-3 py-1 rounded-xl border-2 border-black shadow-[2px_2px_0px_0px_#000]">
-          <Crown className="w-4 h-4 text-amber-600 fill-amber-400" />
-          <span className="font-black text-xs text-slate-950 uppercase">PIMPINAN UTAMA</span>
-        </div>
-
-        <div className="flex flex-col md:flex-row items-center md:items-start gap-6 relative z-10">
-          {/* Leader Photo */}
-          <div className="relative w-28 h-28 sm:w-36 sm:h-36 shrink-0 rounded-3xl border-3 border-black overflow-hidden shadow-[5px_5px_0px_0px_#000] bg-white">
-            <img
-              src={leader.photoUrl}
-              alt={leader.name}
-              className={`w-full h-full object-cover ${leader.imagePosition || 'object-center'}`}
-            />
+      {/* Prominent Highlighted Leader Section (Only if leader exists in data) */}
+      {leader && (
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="relative rounded-3xl bg-gradient-to-br from-amber-300 via-amber-200 to-amber-400 border-4 border-black p-6 md:p-8 shadow-[8px_8px_0px_0px_#000] overflow-hidden"
+        >
+          <div className="absolute top-4 right-4 hidden sm:flex items-center gap-2 bg-white px-3 py-1 rounded-xl border-2 border-black shadow-[2px_2px_0px_0px_#000]">
+            <Crown className="w-4 h-4 text-amber-600 fill-amber-400" />
+            <span className="font-black text-xs text-slate-950 uppercase">PIMPINAN UTAMA</span>
           </div>
 
-          {/* Leader Info */}
-          <div className="space-y-3 text-center md:text-left flex-1">
-            <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
-              <Badge variant="yellow" className="bg-white text-slate-950 font-black border-2 border-black">
-                <Crown className="w-3.5 h-3.5 text-amber-600 fill-amber-400 inline mr-1" />
-                KETUA CHAPTER
-              </Badge>
-              <Badge variant="blue" className="bg-cyan-300 text-slate-950 font-black border-2 border-black">
-                <Award className="w-3.5 h-3.5 text-slate-950 inline mr-1" />
-                PERIODE 2026
-              </Badge>
+          <div className="flex flex-col md:flex-row items-center md:items-start gap-6 relative z-10">
+            {/* Leader Photo */}
+            <div className="relative w-28 h-28 sm:w-36 sm:h-36 shrink-0 rounded-3xl border-3 border-black overflow-hidden shadow-[5px_5px_0px_0px_#000] bg-white">
+              <img
+                src={leader.photoUrl || '/images/san-activity.jpg'}
+                alt={leader.name}
+                onError={(e) => {
+                  e.currentTarget.src = '/images/san-activity.jpg';
+                }}
+                className={`w-full h-full object-cover ${leader.imagePosition || 'object-center'}`}
+              />
             </div>
 
-            <div>
-              <h2 className="text-2xl md:text-4xl font-black text-slate-950 tracking-tight">
-                {leader.name}
-              </h2>
-              <p className="text-sm md:text-base font-extrabold text-amber-900 uppercase tracking-wider mt-0.5">
-                {leader.role || 'Ketua Chapter Tasikmalaya'}
-              </p>
-            </div>
+            {/* Leader Info */}
+            <div className="space-y-3 text-center md:text-left flex-1">
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
+                <Badge variant="yellow" className="bg-white text-slate-950 font-black border-2 border-black">
+                  <Crown className="w-3.5 h-3.5 text-amber-600 fill-amber-400 inline mr-1" />
+                  KETUA CHAPTER
+                </Badge>
+                <Badge variant="blue" className="bg-cyan-300 text-slate-950 font-black border-2 border-black">
+                  <Award className="w-3.5 h-3.5 text-slate-950 inline mr-1" />
+                  PERIODE 2026
+                </Badge>
+              </div>
 
-            {leader.bio && (
-              <p className="text-xs md:text-sm text-slate-900 font-bold bg-white/90 p-3 rounded-2xl border-2 border-black shadow-[3px_3px_0px_0px_#000] leading-relaxed max-w-xl italic">
-                &quot;{leader.bio}&quot;
-              </p>
-            )}
+              <div>
+                <h2 className="text-2xl md:text-4xl font-black text-slate-950 tracking-tight">
+                  {leader.name}
+                </h2>
+                <p className="text-sm md:text-base font-extrabold text-amber-900 uppercase tracking-wider mt-0.5">
+                  {leader.role || 'Ketua Chapter Tasikmalaya'}
+                </p>
+              </div>
 
-            {/* Social Links */}
-            <div className="pt-2 flex items-center justify-center md:justify-start gap-2.5">
-              {leader.email && (
-                <a
-                  href={`mailto:${leader.email}`}
-                  title={`Email: ${leader.email}`}
-                  className="p-2 rounded-xl bg-white border-2 border-black hover:bg-amber-300 transition-colors shadow-[2px_2px_0px_0px_#000]"
-                >
-                  <Mail className="w-4 h-4 text-slate-950" />
-                </a>
+              {leader.bio && (
+                <p className="text-xs md:text-sm text-slate-900 font-bold bg-white/90 p-3 rounded-2xl border-2 border-black shadow-[3px_3px_0px_0px_#000] leading-relaxed max-w-xl italic">
+                  &quot;{leader.bio}&quot;
+                </p>
               )}
-              {leader.instagram && (
-                <a
-                  href={getInstagramUrl(leader.instagram)}
-                  target="_blank"
-                  rel="noreferrer"
-                  title={`Instagram: ${leader.instagram}`}
-                  className="p-2 rounded-xl bg-white border-2 border-black hover:bg-rose-300 transition-colors shadow-[2px_2px_0px_0px_#000]"
+
+              {/* Social Links */}
+              <div className="pt-2 flex items-center justify-center md:justify-start gap-2.5">
+                {leader.email && (
+                  <a
+                    href={`mailto:${leader.email}`}
+                    title={`Email: ${leader.email}`}
+                    className="p-2 rounded-xl bg-white border-2 border-black hover:bg-amber-300 transition-colors shadow-[2px_2px_0px_0px_#000]"
+                  >
+                    <Mail className="w-4 h-4 text-slate-950" />
+                  </a>
+                )}
+                {leader.instagram && (
+                  <a
+                    href={getInstagramUrl(leader.instagram)}
+                    target="_blank"
+                    rel="noreferrer"
+                    title={`Instagram: ${leader.instagram}`}
+                    className="p-2 rounded-xl bg-white border-2 border-black hover:bg-rose-300 transition-colors shadow-[2px_2px_0px_0px_#000]"
+                  >
+                    <Camera className="w-4 h-4 text-slate-950" />
+                  </a>
+                )}
+                {leader.whatsapp && (
+                  <a
+                    href={getWhatsAppUrl(leader.whatsapp)}
+                    target="_blank"
+                    rel="noreferrer"
+                    title={`WhatsApp: ${leader.whatsapp}`}
+                    className="p-2 rounded-xl bg-white border-2 border-black hover:bg-emerald-300 transition-colors shadow-[2px_2px_0px_0px_#000]"
+                  >
+                    <MessageSquare className="w-4 h-4 text-slate-950" />
+                  </a>
+                )}
+                <button
+                  onClick={() => handleShareMember(leader)}
+                  title="Bagikan Info Pengurus"
+                  className="p-2 rounded-xl bg-white border-2 border-black hover:bg-cyan-300 transition-colors shadow-[2px_2px_0px_0px_#000] flex items-center gap-1 text-xs font-black"
                 >
-                  <Camera className="w-4 h-4 text-slate-950" />
-                </a>
-              )}
-              {leader.whatsapp && (
-                <a
-                  href={getWhatsAppUrl(leader.whatsapp)}
-                  target="_blank"
-                  rel="noreferrer"
-                  title={`WhatsApp: ${leader.whatsapp}`}
-                  className="p-2 rounded-xl bg-white border-2 border-black hover:bg-emerald-300 transition-colors shadow-[2px_2px_0px_0px_#000]"
-                >
-                  <MessageSquare className="w-4 h-4 text-slate-950" />
-                </a>
-              )}
-              <button
-                onClick={() => handleShareMember(leader)}
-                title="Bagikan Info Pengurus"
-                className="p-2 rounded-xl bg-white border-2 border-black hover:bg-cyan-300 transition-colors shadow-[2px_2px_0px_0px_#000] flex items-center gap-1 text-xs font-black"
-              >
-                {copiedId === leader.id ? <Check className="w-4 h-4 text-emerald-600" /> : <Share2 className="w-4 h-4 text-slate-950" />}
-              </button>
+                  {copiedId === leader.id ? <Check className="w-4 h-4 text-emerald-600" /> : <Share2 className="w-4 h-4 text-slate-950" />}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      </motion.div>
+        </motion.div>
+      )}
 
       {/* Division Tabs Filter */}
       <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b-3 border-black scrollbar-none">
@@ -213,10 +204,22 @@ export default function AnggotaPage() {
           <div className="w-10 h-10 border-4 border-cyan-400 border-t-black rounded-full animate-spin mx-auto" />
           <p className="font-extrabold text-slate-800 text-sm">Memuat direktori pengurus...</p>
         </div>
+      ) : members.length === 0 ? (
+        <div className="bg-white border-3 border-black rounded-3xl p-8 md:p-12 text-center space-y-3 shadow-[4px_4px_0px_0px_#000]">
+          <div className="w-14 h-14 rounded-2xl bg-cyan-100 border-2 border-black flex items-center justify-center mx-auto shadow-[2px_2px_0px_0px_#000]">
+            <Users className="w-7 h-7 text-black" />
+          </div>
+          <h3 className="text-lg md:text-xl font-black text-slate-950">
+            Belum Ada Data Pengurus Ditampilkan
+          </h3>
+          <p className="text-xs md:text-sm font-bold text-slate-700 max-w-md mx-auto">
+            Daftar pengurus, relawan, dan struktur organisasi resmi San Chapter Tasikmalaya akan segera hadir di sini setelah ditambahkan melalui panel admin.
+          </p>
+        </div>
       ) : standardMembers.length === 0 ? (
-        <div className="bg-white border-3 border-black rounded-3xl p-10 text-center space-y-3 shadow-[4px_4px_0px_0px_#000]">
-          <Users className="w-10 h-10 text-slate-400 mx-auto" />
-          <h3 className="text-lg font-black text-slate-950">Belum ada anggota terdaftar di kategori ini</h3>
+        <div className="bg-white border-3 border-black rounded-3xl p-8 text-center space-y-2 shadow-[4px_4px_0px_0px_#000]">
+          <Users className="w-8 h-8 text-slate-400 mx-auto" />
+          <h3 className="text-base font-black text-slate-950">Belum ada anggota lain terdaftar di kategori ini</h3>
         </div>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
@@ -237,8 +240,11 @@ export default function AnggotaPage() {
                     {/* Compact Avatar for Mobile 2-col Grid */}
                     <div className="relative w-16 h-16 sm:w-24 sm:h-24 mx-auto rounded-2xl border-2 sm:border-3 border-black overflow-hidden shadow-[3px_3px_0px_0px_#000] bg-amber-100">
                       <img
-                        src={member.photoUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400'}
+                        src={member.photoUrl || '/images/san-activity.jpg'}
                         alt={member.name}
+                        onError={(e) => {
+                          e.currentTarget.src = '/images/san-activity.jpg';
+                        }}
                         className={`w-full h-full object-cover ${member.imagePosition || 'object-center'}`}
                       />
                     </div>

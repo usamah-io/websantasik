@@ -53,7 +53,7 @@ export async function Footer() {
             </li>
             <li>
               <Link href="/berita" className="hover:text-amber-400 transition-colors">
-                Berita & Artikel
+                Berita & Warta
               </Link>
             </li>
             <li>
