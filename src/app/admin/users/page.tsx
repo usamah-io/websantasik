@@ -152,7 +152,7 @@ export default function AdminUsersPage() {
                 required
                 value={inviteEmail}
                 onChange={(e) => setInviteEmail(e.target.value)}
-                placeholder="pengurus@santasikmalaya.org"
+                placeholder="pengurus@gmail.com"
                 className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border-2 border-black font-black bg-white text-slate-950 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400"
               />
               <Mail className="w-4 h-4 text-slate-950 absolute left-3 top-3.5" />

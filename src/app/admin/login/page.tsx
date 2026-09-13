@@ -1,45 +1,42 @@
 'use client';
 
-import { signIn, useSession } from 'next-auth/react';
+import { signIn, signOut, useSession } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { RetroButton } from '@/components/ui/RetroButton';
 import { Badge } from '@/components/ui/Badge';
-import { ArrowLeft, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, ShieldCheck, ShieldAlert, LogOut } from 'lucide-react';
 
 function AdminLoginForm() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
   const rawCallback = searchParams.get('callbackUrl');
+  const authError = searchParams.get('error');
+
+  const targetCallback =
+    rawCallback &&
+    !rawCallback.includes('/login') &&
+    !rawCallback.includes('/admin/login') &&
+    rawCallback !== '/'
+      ? rawCallback
+      : '/admin';
 
   useEffect(() => {
     if (status === 'authenticated' && session?.user) {
       const userRole = (session.user as any)?.role || 'user';
 
-      // If explicit custom destination (like /admin/gallery or /berita), honor it
-      if (
-        rawCallback &&
-        !rawCallback.includes('/login') &&
-        !rawCallback.includes('/admin/login') &&
-        rawCallback !== '/'
-      ) {
-        router.push(rawCallback);
-        return;
-      }
-
-      // Role-Based Post-Login Routing
+      // Role-Based Post-Login Routing for authorized administrators
       if (userRole === 'super_admin' || userRole === 'admin') {
-        router.push('/admin');
-      } else {
-        router.push('/');
+        router.push(targetCallback);
       }
+      // If userRole === 'user', stay on page and let UI display role notice instead of looping
     }
-  }, [session, status, router, rawCallback]);
+  }, [session, status, router, targetCallback]);
 
   const handleGoogleSignIn = () => {
-    signIn('google', { callbackUrl: rawCallback || '/login' });
+    signIn('google', { callbackUrl: targetCallback });
   };
 
   return (
@@ -75,6 +72,36 @@ function AdminLoginForm() {
               Masuk dengan akun Google resmi untuk mengabdi dan mengakses fitur platform San Chapter Tasikmalaya.
             </p>
           </div>
+
+          {/* Status Notifications */}
+          {status === 'authenticated' && session?.user && (session.user as any)?.role === 'user' && (
+            <div className="p-4 rounded-2xl bg-amber-100 border-2 border-black space-y-2 text-slate-950 shadow-[3px_3px_0px_0px_#000]">
+              <div className="flex items-center gap-2 font-black text-xs text-amber-900">
+                <ShieldAlert className="w-4 h-4 text-amber-700 shrink-0" />
+                <span>AKSES BELUM DIBERIKAN</span>
+              </div>
+              <p className="text-xs font-bold leading-relaxed">
+                Akun Google <span className="font-mono font-black underline">{session.user.email}</span> berhasil masuk, namun belum memiliki peranan Admin/Super Admin di database.
+              </p>
+              <div className="flex flex-wrap items-center gap-2 pt-1">
+                <RetroButton variant="outline" size="sm" onClick={() => signOut({ callbackUrl: '/admin/login' })}>
+                  <LogOut className="w-3.5 h-3.5" /> Ganti Akun Google
+                </RetroButton>
+                <Link href="/">
+                  <RetroButton variant="secondary" size="sm">
+                    Ke Beranda
+                  </RetroButton>
+                </Link>
+              </div>
+            </div>
+          )}
+
+          {authError && authError === 'AccessDenied' && (!session?.user || (session.user as any)?.role !== 'user') && (
+            <div className="p-3 rounded-2xl bg-rose-100 border-2 border-black text-xs font-black text-rose-950 flex items-center gap-2 shadow-[2px_2px_0px_0px_#000]">
+              <ShieldAlert className="w-4 h-4 text-rose-700 shrink-0" />
+              <span>Akses ditolak: Silakan masuk dengan akun Google pengurus yang berwenang.</span>
+            </div>
+          )}
 
           {/* Google OAuth Button */}
           <div className="pt-2">

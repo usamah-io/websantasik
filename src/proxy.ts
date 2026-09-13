@@ -7,15 +7,43 @@ export async function proxy(req: NextRequest) {
 
   // Protect /admin routes (except /admin/login)
   if (path.startsWith('/admin') && !path.startsWith('/admin/login')) {
-    const token = await getToken({
+    const secret = process.env.NEXTAUTH_SECRET || 'san-tasikmalaya-super-secret-key-2026';
+
+    // Robust token retrieval checking both secure and non-secure cookie prefixes
+    let token = await getToken({
       req,
-      secret: process.env.NEXTAUTH_SECRET || 'san-tasikmalaya-super-secret-key-2026',
+      secret,
+      secureCookie: true,
+      cookieName: '__Secure-next-auth.session-token',
     });
+
+    if (!token) {
+      token = await getToken({
+        req,
+        secret,
+        secureCookie: false,
+        cookieName: 'next-auth.session-token',
+      });
+    }
+
+    if (!token) {
+      token = await getToken({
+        req,
+        secret,
+      });
+    }
 
     const userRole = (token as any)?.role || 'user';
 
-    // Block unauthenticated users or users with regular 'user' role
-    if (!token || (userRole !== 'super_admin' && userRole !== 'admin')) {
+    // If not authenticated, redirect to login with return callbackUrl
+    if (!token) {
+      const loginUrl = new URL('/admin/login', req.url);
+      loginUrl.searchParams.set('callbackUrl', path);
+      return NextResponse.redirect(loginUrl);
+    }
+
+    // If logged in as regular user without admin rights
+    if (userRole !== 'super_admin' && userRole !== 'admin') {
       const loginUrl = new URL('/admin/login', req.url);
       loginUrl.searchParams.set('error', 'AccessDenied');
       loginUrl.searchParams.set('callbackUrl', path);

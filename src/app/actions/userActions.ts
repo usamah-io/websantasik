@@ -6,7 +6,7 @@ import { requireSuperAdminSession } from '@/lib/auth';
 import { recordAuditLog } from '@/lib/audit';
 
 export async function getUsersList() {
-  await requireSuperAdminSession();
+  const session = await requireSuperAdminSession();
 
   try {
     await connectToDatabase();
@@ -26,36 +26,22 @@ export async function getUsersList() {
     console.warn('DB user query error, using fallback users:', (err as Error).message);
   }
 
-  // Fallback initial list if DB connection is offline
-  return [
-    {
-      id: 'usr-1',
-      name: 'Super Admin San Tasik',
-      email: 'admin@santasikmalaya.org',
-      image: 'https://api.dicebear.com/7.x/bottts/svg?seed=admin',
-      role: 'super_admin' as UserRole,
-      isWhitelisted: true,
-      lastLoginAt: new Date().toISOString(),
-    },
-    {
-      id: 'usr-2',
-      name: 'Pengurus Humas Utama',
-      email: 'pengurus@santasikmalaya.org',
-      image: 'https://api.dicebear.com/7.x/bottts/svg?seed=pengurus',
-      role: 'admin' as UserRole,
-      isWhitelisted: true,
-      lastLoginAt: new Date(Date.now() - 3600000).toISOString(),
-    },
-    {
-      id: 'usr-3',
-      name: 'Member Relawan',
-      email: 'user@gmail.com',
-      image: 'https://api.dicebear.com/7.x/bottts/svg?seed=user',
-      role: 'user' as UserRole,
-      isWhitelisted: false,
-      lastLoginAt: new Date(Date.now() - 86400000).toISOString(),
-    },
-  ];
+  // Fallback if DB is temporarily empty or offline: return current active Super Admin account
+  if (session?.user?.email) {
+    return [
+      {
+        id: 'curr-user',
+        name: session.user.name || session.user.email.split('@')[0],
+        email: session.user.email,
+        image: session.user.image || '',
+        role: ((session.user as any).role as UserRole) || 'super_admin',
+        isWhitelisted: true,
+        lastLoginAt: new Date().toISOString(),
+      },
+    ];
+  }
+
+  return [];
 }
 
 export async function updateUserRoleAction(targetEmail: string, newRole: UserRole) {

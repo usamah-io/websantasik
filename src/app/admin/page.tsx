@@ -26,32 +26,26 @@ export default async function AdminDashboardPage() {
 
   const isSuperAdmin = role === 'super_admin';
 
-  let totalViews = 2480;
-  let totalMembers = 8;
+  let totalViews = 0;
+  let totalMembers = 0;
   let totalNews = 0;
-  let auditLogsCount = 25;
+  let auditLogsCount = 0;
 
   try {
     await connectToDatabase();
     const viewsAgg = await News.aggregate([
-      { $match: { slug: { $nin: ['festival-seni-budaya-san-tasikmalaya-2026', 'musyawarah-anggota-pemilihan-ketua-umum', 'aksi-kebersihan-penanaman-pohon-galunggung'] } } },
       { $group: { _id: null, total: { $sum: '$views' } } },
     ]);
-    if (viewsAgg && viewsAgg.length > 0 && viewsAgg[0].total > 0) {
-      totalViews = viewsAgg[0].total + 1800;
+    if (viewsAgg && viewsAgg.length > 0 && typeof viewsAgg[0].total === 'number') {
+      totalViews = viewsAgg[0].total;
     }
-    const newsCount = await News.countDocuments({
-      slug: { $nin: ['festival-seni-budaya-san-tasikmalaya-2026', 'musyawarah-anggota-pemilihan-ketua-umum', 'aksi-kebersihan-penanaman-pohon-galunggung'] },
-    });
-    totalNews = newsCount;
-
-    const membersCount = await Member.countDocuments();
-    if (membersCount > 0) totalMembers = membersCount;
+    totalNews = await News.countDocuments();
+    totalMembers = await Member.countDocuments();
 
     const logs = await getRecentAuditLogs(50);
-    if (logs && logs.length > 0) auditLogsCount = logs.length;
+    if (logs) auditLogsCount = logs.length;
   } catch (e) {
-    console.warn('Dashboard stats aggregate fallback:', (e as Error).message);
+    console.warn('Dashboard stats aggregate error:', (e as Error).message);
   }
 
   return (
@@ -63,16 +57,24 @@ export default async function AdminDashboardPage() {
             <Badge variant="yellow" className="bg-white text-slate-950 font-black text-xs">
               <ShieldCheck className="w-4 h-4 text-slate-950 shrink-0" /> AREA TERPROTEKSI
             </Badge>
-            <Badge variant={isSuperAdmin ? 'purple' : 'green'} className="text-slate-950 font-black text-xs">
+            <Badge variant={isSuperAdmin ? 'purple' : 'green'} className="text-slate-950 font-black text-xs uppercase">
               {isSuperAdmin ? 'SUPER ADMIN' : 'REGULAR ADMIN'}
             </Badge>
           </div>
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-950 tracking-tight">
             Selamat Datang di Portal Admin
           </h1>
-          <p className="text-xs sm:text-sm font-extrabold text-slate-950">
-            San Chapter Tasikmalaya • Hak Akses: <span className="uppercase underline font-black">{role.replace('_', ' ')}</span>
-          </p>
+          <div className="flex items-center gap-2.5 pt-1">
+            <img
+              src={session.user.image || 'https://api.dicebear.com/7.x/bottts/svg?seed=' + session.user.email}
+              alt="Avatar"
+              className="w-7 h-7 rounded-full border-2 border-black"
+            />
+            <div className="text-xs sm:text-sm font-extrabold text-slate-950">
+              Akun: <span className="font-mono underline font-black">{session.user.email}</span> • Hak Akses:{' '}
+              <span className="uppercase font-black">{role.replace('_', ' ')}</span>
+            </div>
+          </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">

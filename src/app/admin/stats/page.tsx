@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
 import { RetroCard } from '@/components/ui/RetroCard';
 import { RetroButton } from '@/components/ui/RetroButton';
 import { Badge } from '@/components/ui/Badge';
@@ -17,9 +18,11 @@ import {
   ArrowLeft,
   CheckCircle2,
   Shield,
+  UserCheck,
 } from 'lucide-react';
 
 export default function AdminStatsPage() {
+  const { data: session } = useSession();
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -53,13 +56,24 @@ export default function AdminStatsPage() {
               <ArrowLeft className="w-3.5 h-3.5" /> Kembali ke Dashboard
             </span>
           </Link>
-          <div className="flex items-center gap-2">
-            <h1 className="text-3xl font-black tracking-tight text-slate-950">
+          <div className="flex flex-wrap items-center gap-2">
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-950">
               Panel Statistik & Audit Log Real-Time
             </h1>
             <Badge variant="green" className="bg-emerald-300 text-slate-950 font-black">
               LIVE
             </Badge>
+          </div>
+          {/* Prominently show current authenticated Google account */}
+          <div className="flex flex-wrap items-center gap-2 pt-2">
+            <div className="flex items-center gap-2 bg-amber-100 border-2 border-black rounded-xl px-3 py-1.5 text-xs font-black text-slate-950 shadow-[2px_2px_0px_0px_#000]">
+              <UserCheck className="w-4 h-4 text-emerald-700 shrink-0" />
+              <span>Akun Login:</span>
+              <span className="font-mono text-cyan-950 underline">{session?.user?.email || 'Memuat email...'}</span>
+              <Badge variant="purple" className="text-[10px] py-0.5 px-2 uppercase font-black">
+                {(session?.user as any)?.role?.replace('_', ' ') || 'SUPER ADMIN'}
+              </Badge>
+            </div>
           </div>
         </div>
 
@@ -68,6 +82,7 @@ export default function AdminStatsPage() {
           size="sm"
           onClick={fetchStats}
           disabled={refreshing}
+          className="bg-white"
         >
           <RotateCw className={`w-4 h-4 text-slate-950 ${refreshing ? 'animate-spin' : ''}`} /> Refresh Data
         </RetroButton>
@@ -131,31 +146,37 @@ export default function AdminStatsPage() {
               </Badge>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {stats?.activeAdmins.map((admin: any, idx: number) => (
-                <div
-                  key={idx}
-                  className="p-4 rounded-2xl bg-amber-50 border-2 border-black space-y-1.5 shadow-[2px_2px_0px_0px_#000]"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="font-black text-slate-950 text-sm">{admin.name}</span>
-                    <Badge variant={admin.role === 'super_admin' ? 'purple' : 'yellow'} className="text-[10px] text-slate-950 font-black">
-                      {admin.role === 'super_admin' ? 'Super Admin' : 'Admin'}
-                    </Badge>
+            {stats?.activeAdmins?.length === 0 ? (
+              <div className="p-6 text-center text-xs font-bold text-slate-700 bg-amber-50/50 rounded-2xl border-2 border-dashed border-slate-300">
+                Belum ada data admin terverifikasi tercatat di database.
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {stats?.activeAdmins.map((admin: any, idx: number) => (
+                  <div
+                    key={idx}
+                    className="p-4 rounded-2xl bg-amber-50 border-2 border-black space-y-1.5 shadow-[2px_2px_0px_0px_#000]"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-black text-slate-950 text-sm">{admin.name}</span>
+                      <Badge variant={admin.role === 'super_admin' ? 'purple' : 'yellow'} className="text-[10px] text-slate-950 font-black">
+                        {admin.role === 'super_admin' ? 'Super Admin' : 'Admin'}
+                      </Badge>
+                    </div>
+                    <p className="text-xs font-black text-slate-800">{admin.email}</p>
+                    <div className="flex items-center justify-between text-[11px] font-bold text-slate-700 pt-1 border-t border-amber-200">
+                      <span className="flex items-center gap-1 font-mono text-slate-950 font-bold">
+                        <Globe className="w-3 h-3 text-cyan-800" /> IP: {admin.lastIp}
+                      </span>
+                      <span className="flex items-center gap-1 text-slate-800 font-bold">
+                        <Clock className="w-3 h-3 text-amber-700" />
+                        {new Date(admin.lastLogin).toLocaleTimeString('id-ID')}
+                      </span>
+                    </div>
                   </div>
-                  <p className="text-xs font-black text-slate-800">{admin.email}</p>
-                  <div className="flex items-center justify-between text-[11px] font-bold text-slate-700 pt-1 border-t border-amber-200">
-                    <span className="flex items-center gap-1 font-mono text-slate-950 font-bold">
-                      <Globe className="w-3 h-3 text-cyan-800" /> IP: {admin.lastIp}
-                    </span>
-                    <span className="flex items-center gap-1 text-slate-800 font-bold">
-                      <Clock className="w-3 h-3 text-amber-700" />
-                      {new Date(admin.lastLogin).toLocaleTimeString('id-ID')}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </RetroCard>
 
           {/* Recent Security IP Audit Log Table (Koleksi audit_logs) */}
@@ -186,36 +207,44 @@ export default function AdminStatsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y border-2 border-black font-bold text-slate-950">
-                  {stats?.recentAuditLogs.map((log: any) => (
-                    <tr key={log.id} className="hover:bg-amber-50 transition-colors">
-                      <td className="p-3 border font-mono text-slate-950 whitespace-nowrap">
-                        {new Date(log.timestamp).toLocaleString('id-ID')}
-                      </td>
-                      <td className="p-3 border font-black text-slate-950">{log.email}</td>
-                      <td className="p-3 border font-mono font-black text-cyan-900">
-                        {log.ipAddress}
-                      </td>
-                      <td className="p-3 border">
-                        <span
-                          className={`px-2 py-0.5 rounded-full border text-[10px] font-black uppercase ${
-                            log.action.includes('SUCCESS') || log.action.includes('CREATE')
-                              ? 'bg-emerald-200 text-slate-950 border-black'
-                              : log.action.includes('REJECTED') || log.action.includes('FAILED')
-                              ? 'bg-rose-200 text-slate-950 border-black'
-                              : 'bg-amber-200 text-slate-950 border-black'
-                          }`}
-                        >
-                          {log.action}
-                        </span>
-                      </td>
-                      <td className="p-3 border max-w-xs truncate text-[11px] text-slate-800">
-                        <div className="font-bold text-slate-950">{log.details}</div>
-                        <div className="text-[10px] text-slate-700 font-mono truncate">
-                          {log.userAgent}
-                        </div>
+                  {stats?.recentAuditLogs?.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="p-8 text-center text-xs font-bold text-slate-600">
+                        Belum ada catatan aktivitas di koleksi <code className="font-mono bg-slate-100 px-1 py-0.5 border border-slate-300 rounded">audit_logs</code> MongoDB.
                       </td>
                     </tr>
-                  ))}
+                  ) : (
+                    stats?.recentAuditLogs.map((log: any) => (
+                      <tr key={log.id} className="hover:bg-amber-50 transition-colors">
+                        <td className="p-3 border font-mono text-slate-950 whitespace-nowrap">
+                          {new Date(log.timestamp).toLocaleString('id-ID')}
+                        </td>
+                        <td className="p-3 border font-black text-slate-950">{log.email}</td>
+                        <td className="p-3 border font-mono font-black text-cyan-900">
+                          {log.ipAddress}
+                        </td>
+                        <td className="p-3 border">
+                          <span
+                            className={`px-2 py-0.5 rounded-full border text-[10px] font-black uppercase ${
+                              log.action.includes('SUCCESS') || log.action.includes('CREATE')
+                                ? 'bg-emerald-200 text-slate-950 border-black'
+                                : log.action.includes('REJECTED') || log.action.includes('FAILED')
+                                ? 'bg-rose-200 text-slate-950 border-black'
+                                : 'bg-amber-200 text-slate-950 border-black'
+                            }`}
+                          >
+                            {log.action}
+                          </span>
+                        </td>
+                        <td className="p-3 border max-w-xs truncate text-[11px] text-slate-800">
+                          <div className="font-bold text-slate-950">{log.details}</div>
+                          <div className="text-[10px] text-slate-700 font-mono truncate">
+                            {log.userAgent}
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>

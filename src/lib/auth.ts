@@ -9,7 +9,6 @@ const defaultSuperAdmins = [
   'san.tasikmalaya.2020@gmail.com',
   'muhammadusamahabdurrahman@gmail.com',
   'musamahabdurrahmanabdurrahman@gmail.com',
-  'admin@santasikmalaya.org',
 ];
 
 const envSuperAdmins = (process.env.SUPER_ADMIN_EMAILS || '')
@@ -19,12 +18,46 @@ const envSuperAdmins = (process.env.SUPER_ADMIN_EMAILS || '')
 
 const superAdminEmails = Array.from(new Set([...defaultSuperAdmins, ...envSuperAdmins]));
 
-const adminEmails = (process.env.ALLOWED_ADMIN_EMAILS || 'pengurus@santasikmalaya.org')
+const adminEmails = (process.env.ALLOWED_ADMIN_EMAILS || '')
   .split(',')
   .map((e) => e.trim().toLowerCase())
   .filter(Boolean);
 
+const isProduction = process.env.NODE_ENV === 'production';
+const hasHttpsUrl = process.env.NEXTAUTH_URL?.startsWith('https://') || Boolean(process.env.VERCEL);
+const useSecureCookies = isProduction && hasHttpsUrl;
+const cookiePrefix = useSecureCookies ? '__Secure-' : '';
+
 export const authOptions: NextAuthOptions = {
+  useSecureCookies,
+  cookies: {
+    sessionToken: {
+      name: `${cookiePrefix}next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: useSecureCookies,
+      },
+    },
+    callbackUrl: {
+      name: `${cookiePrefix}next-auth.callback-url`,
+      options: {
+        sameSite: 'lax',
+        path: '/',
+        secure: useSecureCookies,
+      },
+    },
+    csrfToken: {
+      name: `${useSecureCookies ? '__Host-' : ''}next-auth.csrf-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: useSecureCookies,
+      },
+    },
+  },
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID || 'demo-google-client-id',
@@ -46,11 +79,17 @@ export const authOptions: NextAuthOptions = {
           role = 'super_admin';
         } else if (adminEmails.includes(email)) {
           role = 'admin';
+        } else {
+          try {
+            await connectToDatabase();
+            const u = await User.findOne({ email });
+            if (u?.role) role = u.role;
+          } catch {}
         }
 
         return {
           id: 'usr_' + Date.now(),
-          name: email.split('@')[0].toUpperCase() + ` (${role.replace('_', ' ').toUpperCase()})`,
+          name: email.split('@')[0].toUpperCase(),
           email: email,
           image: 'https://api.dicebear.com/7.x/bottts/svg?seed=' + email,
           role,
@@ -81,23 +120,37 @@ export const authOptions: NextAuthOptions = {
           isWhitelisted = true;
         }
 
+        let ip = '127.0.0.1';
+        let ua = 'Browser';
+        try {
+          const { headers } = await import('next/headers');
+          const headerList = await headers();
+          const forwarded = headerList.get('x-forwarded-for');
+          const realIp = headerList.get('x-real-ip');
+          ip = forwarded ? forwarded.split(',')[0].trim() : realIp || '127.0.0.1';
+          ua = headerList.get('user-agent') || 'Browser';
+        } catch {}
+
         await User.findOneAndUpdate(
           { email: userEmail },
           {
-            name: user.name || 'Pengurus San Tasik',
+            name: user.name || existingUser?.name || userEmail.split('@')[0],
             email: userEmail,
-            image: user.image,
+            image: user.image || existingUser?.image,
             role: assignedRole,
             isWhitelisted,
             lastLoginAt: new Date(),
+            lastIpAddress: ip,
           },
           { upsert: true, new: true }
         );
 
         await recordAuditLog({
           email: userEmail,
+          ipAddress: ip,
+          userAgent: ua,
           action: `${assignedRole.toUpperCase()}_LOGIN_SUCCESS`,
-          details: `Login Google OAuth sebagai ${assignedRole.toUpperCase()}`,
+          details: `Login Google OAuth berhasil sebagai ${assignedRole.toUpperCase()}`,
         });
       } catch (err) {
         console.warn('Could not sync user to DB on sign-in:', (err as Error).message);
@@ -105,21 +158,41 @@ export const authOptions: NextAuthOptions = {
 
       return true;
     },
+    async jwt({ token, user }) {
+      const email = (user?.email || token?.email || '').toLowerCase().trim();
+      if (!email) return token;
+      token.email = email;
+
+      if (superAdminEmails.includes(email)) {
+        token.role = 'super_admin';
+      } else if (adminEmails.includes(email)) {
+        token.role = 'admin';
+      } else if (!token.role || token.role === 'user') {
+        try {
+          await connectToDatabase();
+          const dbUser = await User.findOne({ email }).lean();
+          if (dbUser?.role) {
+            token.role = dbUser.role;
+          } else {
+            token.role = token.role || 'user';
+          }
+        } catch {
+          token.role = token.role || 'user';
+        }
+      }
+
+      if (user) {
+        token.id = (user as any).id || token.sub;
+      }
+      return token;
+    },
     async session({ session, token }) {
       if (session.user) {
         (session.user as any).id = token.sub;
         (session.user as any).role = (token as any).role || 'user';
+        session.user.email = (token.email as string) || session.user.email;
       }
       return session;
-    },
-    async jwt({ token, user }) {
-      const email = (user?.email || token?.email || '').toLowerCase().trim();
-      if (superAdminEmails.includes(email)) {
-        token.role = 'super_admin';
-      } else if (user) {
-        token.role = (user as any).role || (adminEmails.includes(email) ? 'admin' : 'user');
-      }
-      return token;
     },
   },
   pages: {
@@ -129,6 +202,7 @@ export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET || 'san-tasikmalaya-super-secret-key-2026',
   session: {
     strategy: 'jwt',
+    maxAge: 30 * 24 * 60 * 60,
   },
 };
 

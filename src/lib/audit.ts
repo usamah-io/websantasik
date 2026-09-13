@@ -11,7 +11,7 @@ export interface AuditParams {
   userAgent?: string;
 }
 
-// In-memory audit log storage for fallback when DB is offline
+// In-memory audit log storage for fallback when DB is temporarily offline (clean, no dummy data)
 const memoryAuditLogs: Array<{
   id: string;
   email: string;
@@ -20,35 +20,7 @@ const memoryAuditLogs: Array<{
   action: string;
   details?: string;
   timestamp: Date;
-}> = [
-  {
-    id: 'mock-1',
-    email: 'admin@santasikmalaya.org',
-    ipAddress: '180.252.120.44',
-    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/122.0.0.0',
-    action: 'SUPER_ADMIN_LOGIN_SUCCESS',
-    details: 'Login Google OAuth berhasil sebagai Super Admin',
-    timestamp: new Date(Date.now() - 1000 * 60 * 12),
-  },
-  {
-    id: 'mock-2',
-    email: 'pengurus@santasikmalaya.org',
-    ipAddress: '36.85.15.92',
-    userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Safari/605.1.15',
-    action: 'CREATE_NEWS',
-    details: 'Menerbitkan berita "Festival Budaya Tasikmalaya 2026"',
-    timestamp: new Date(Date.now() - 1000 * 60 * 45),
-  },
-  {
-    id: 'mock-3',
-    email: 'user@gmail.com',
-    ipAddress: '125.160.22.101',
-    userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_3 like Mac OS X) Mobile/15E148',
-    action: 'USER_LOGIN',
-    details: 'Google login otomatis dengan role default USER',
-    timestamp: new Date(Date.now() - 1000 * 60 * 180),
-  },
-];
+}> = [];
 
 // SHA-256 IP Anonymizer helper for privacy compliance option
 export function hashIpAddress(ip: string): string {
