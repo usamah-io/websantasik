@@ -5,7 +5,7 @@ import { RetroCard } from '@/components/ui/RetroCard';
 import { RetroButton } from '@/components/ui/RetroButton';
 import { Badge } from '@/components/ui/Badge';
 import Link from 'next/link';
-import { MessageSquare, Mail, ArrowLeft, Settings, Check, ExternalLink } from 'lucide-react';
+import { MessageSquare, Mail, ArrowLeft, Settings, Check, ExternalLink, RotateCw, AlertTriangle } from 'lucide-react';
 import { InstagramIcon, YoutubeIcon } from '@/components/ui/SocialIcons';
 import { getSiteSettings, updateSiteSettingsAction } from '@/app/actions/settingsActions';
 
@@ -17,17 +17,26 @@ export default function AdminSettingsPage() {
     email: 'san.tasikmalaya.2020@gmail.com',
   });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
 
-  useEffect(() => {
-    async function load() {
-      setLoading(true);
+  const loadSettings = async () => {
+    setLoading(true);
+    setError(null);
+    try {
       const data = await getSiteSettings();
-      setSettings(data);
+      if (data) setSettings(data);
+    } catch (err) {
+      console.warn('Failed to load settings:', err);
+      setError('Gagal memuat pengaturan jejaring dari database.');
+    } finally {
       setLoading(false);
     }
-    load();
+  };
+
+  useEffect(() => {
+    loadSettings();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -72,6 +81,16 @@ export default function AdminSettingsPage() {
         <div className="text-center py-16 space-y-3">
           <div className="w-10 h-10 border-4 border-amber-400 border-t-black rounded-full animate-spin mx-auto" />
           <p className="font-extrabold text-slate-800 text-sm">Memuat pengaturan jejaring...</p>
+        </div>
+      ) : error ? (
+        <div className="py-8 text-center space-y-3 bg-rose-50 border-2 border-black rounded-2xl p-6 shadow-[2px_2px_0px_0px_#000] max-w-xl mx-auto">
+          <div className="w-10 h-10 rounded-xl bg-rose-200 border-2 border-black flex items-center justify-center mx-auto text-rose-700">
+            <AlertTriangle className="w-5 h-5" />
+          </div>
+          <p className="font-black text-rose-950 text-sm">{error}</p>
+          <RetroButton variant="primary" size="sm" onClick={loadSettings} className="mx-auto font-black text-xs text-black">
+            <RotateCw className="w-3.5 h-3.5 mr-1 text-black" /> Coba Lagi
+          </RetroButton>
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">

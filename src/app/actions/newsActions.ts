@@ -32,11 +32,8 @@ const initialNews: Array<{
 export async function getNewsList(query?: string, category?: string) {
   try {
     await connectToDatabase();
-    try {
-      await News.deleteMany({ slug: { $in: DUMMY_SLUGS } });
-    } catch {}
 
-    const filter: any = { isPublished: true, slug: { $nin: DUMMY_SLUGS } };
+    const filter: any = { isPublished: true };
 
     if (category && category !== 'Semua') {
       filter.category = category;
@@ -49,7 +46,7 @@ export async function getNewsList(query?: string, category?: string) {
 
     const newsDocs = await News.find(filter).sort({ createdAt: -1 }).lean();
 
-    if (newsDocs) {
+    if (newsDocs && newsDocs.length > 0) {
       return newsDocs.map((doc: any) => ({
         id: doc._id.toString(),
         title: doc.title,
@@ -66,41 +63,24 @@ export async function getNewsList(query?: string, category?: string) {
         createdAt: doc.createdAt ? new Date(doc.createdAt).toISOString() : new Date().toISOString(),
       }));
     }
+
+    return [];
   } catch (e) {
-    console.warn('DB query error in getNewsList, fallback to mock data:', (e as Error).message);
+    console.warn('DB query error in getNewsList:', (e as Error).message);
+    return [];
   }
-
-  let filtered = [...initialNews];
-  if (category && category !== 'Semua') {
-    filtered = filtered.filter((n) => n.category.toLowerCase() === category.toLowerCase());
-  }
-  if (query && query.trim() !== '') {
-    const q = query.toLowerCase();
-    filtered = filtered.filter(
-      (n) => n.title.toLowerCase().includes(q) || n.summary.toLowerCase().includes(q)
-    );
-  }
-
-  return filtered.map((item) => ({
-    ...item,
-    imageUrl: convertGoogleDriveUrl(item.imageUrl) || FALLBACK_IMAGE_URL,
-    images: (item.images || []).map((url) => convertGoogleDriveUrl(url)).filter(Boolean),
-  }));
 }
 
 export async function getLatestNews(limit: number = 3) {
   try {
     await connectToDatabase();
-    try {
-      await News.deleteMany({ slug: { $in: DUMMY_SLUGS } });
-    } catch {}
 
-    const newsDocs = await News.find({ isPublished: true, slug: { $nin: DUMMY_SLUGS } })
+    const newsDocs = await News.find({ isPublished: true })
       .sort({ createdAt: -1 })
       .limit(limit)
       .lean();
 
-    if (newsDocs) {
+    if (newsDocs && newsDocs.length > 0) {
       return newsDocs.map((doc: any) => ({
         id: doc._id.toString(),
         title: doc.title,
@@ -117,15 +97,12 @@ export async function getLatestNews(limit: number = 3) {
         createdAt: doc.createdAt ? new Date(doc.createdAt).toISOString() : new Date().toISOString(),
       }));
     }
-  } catch (e) {
-    console.warn('DB query error in getLatestNews, fallback to mock data:', (e as Error).message);
-  }
 
-  return initialNews.slice(0, limit).map((item) => ({
-    ...item,
-    imageUrl: convertGoogleDriveUrl(item.imageUrl) || FALLBACK_IMAGE_URL,
-    images: (item.images || []).map((url) => convertGoogleDriveUrl(url)).filter(Boolean),
-  }));
+    return [];
+  } catch (e) {
+    console.warn('DB query error in getLatestNews:', (e as Error).message);
+    return [];
+  }
 }
 
 export async function getNewsBySlug(slug: string) {

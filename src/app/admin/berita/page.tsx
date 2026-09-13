@@ -6,13 +6,14 @@ import { RetroButton } from '@/components/ui/RetroButton';
 import { Badge } from '@/components/ui/Badge';
 import { getNewsList, createNewsAction, updateNewsAction, deleteNewsAction } from '@/app/actions/newsActions';
 import Link from 'next/link';
-import { Newspaper, Plus, Trash2, ArrowLeft, Eye, Pencil, Image as ImageIcon, X } from 'lucide-react';
+import { Newspaper, Plus, Trash2, ArrowLeft, Eye, Pencil, Image as ImageIcon, X, RotateCw, AlertTriangle } from 'lucide-react';
 
 const FALLBACK_NEWS_IMAGE = '/images/san-activity.jpg';
 
 export default function AdminBeritaPage() {
   const [articles, setArticles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [editingArticle, setEditingArticle] = useState<any | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -21,9 +22,16 @@ export default function AdminBeritaPage() {
 
   const fetchNews = async () => {
     setLoading(true);
-    const data = await getNewsList();
-    setArticles(data);
-    setLoading(false);
+    setError(null);
+    try {
+      const data = await getNewsList();
+      setArticles(data || []);
+    } catch (err) {
+      console.warn('Failed to load news in admin:', err);
+      setError('Gagal memuat daftar berita dari database MongoDB Atlas.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -304,7 +312,20 @@ export default function AdminBeritaPage() {
         </div>
 
         {loading ? (
-          <p className="text-center py-8 font-bold text-slate-600">Memuat berita...</p>
+          <div className="py-12 text-center space-y-3">
+            <div className="w-8 h-8 border-4 border-amber-400 border-t-black rounded-full animate-spin mx-auto" />
+            <p className="font-extrabold text-slate-800 text-sm">Memuat berita dari database...</p>
+          </div>
+        ) : error ? (
+          <div className="py-8 text-center space-y-3 bg-rose-50 border-2 border-black rounded-2xl p-6 shadow-[2px_2px_0px_0px_#000]">
+            <div className="w-10 h-10 rounded-xl bg-rose-200 border-2 border-black flex items-center justify-center mx-auto text-rose-700">
+              <AlertTriangle className="w-5 h-5" />
+            </div>
+            <p className="font-black text-rose-950 text-sm">{error}</p>
+            <RetroButton variant="primary" size="sm" onClick={fetchNews} className="mx-auto font-black text-xs text-black">
+              <RotateCw className="w-3.5 h-3.5 mr-1 text-black" /> Coba Lagi
+            </RetroButton>
+          </div>
         ) : articles.length === 0 ? (
           <p className="text-center py-8 font-bold text-slate-600">Belum ada berita.</p>
         ) : (

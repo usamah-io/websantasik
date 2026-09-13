@@ -19,6 +19,7 @@ import {
   CheckCircle2,
   Shield,
   UserCheck,
+  AlertTriangle,
 } from 'lucide-react';
 
 export default function AdminStatsPage() {
@@ -26,14 +27,17 @@ export default function AdminStatsPage() {
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchStats = async () => {
     setRefreshing(true);
+    setError(null);
     try {
       const data = await getAdminRealtimeStats();
       setStats(data);
     } catch (e) {
       console.error(e);
+      setError('Gagal memuat statistik real-time dari database MongoDB Atlas.');
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -93,6 +97,19 @@ export default function AdminStatsPage() {
           <div className="w-10 h-10 border-4 border-amber-400 border-t-black rounded-full animate-spin mx-auto" />
           <p className="font-extrabold text-slate-800 text-sm">Mengambil log MongoDB & statistik real-time...</p>
         </div>
+      ) : error && !stats ? (
+        <div className="py-12 text-center space-y-4 bg-rose-50 border-3 border-black rounded-3xl p-8 max-w-xl mx-auto shadow-[4px_4px_0px_0px_#000]">
+          <div className="w-12 h-12 rounded-2xl bg-rose-200 border-2 border-black flex items-center justify-center mx-auto text-rose-700">
+            <AlertTriangle className="w-6 h-6" />
+          </div>
+          <div className="space-y-1">
+            <h3 className="font-black text-rose-950 text-base">Gagal Memuat Statistik Real-time</h3>
+            <p className="font-bold text-rose-900 text-xs">{error}</p>
+          </div>
+          <RetroButton variant="primary" size="sm" onClick={fetchStats} className="mx-auto font-black text-black">
+            <RotateCw className="w-4 h-4 mr-1 text-black" /> Coba Lagi
+          </RetroButton>
+        </div>
       ) : (
         <>
           {/* Key Metric Stat Cards - Crisp High Contrast Styling */}
@@ -102,7 +119,7 @@ export default function AdminStatsPage() {
                 <span className="text-xs font-black uppercase tracking-wider text-slate-950">Total Views & Views</span>
                 <Eye className="w-5 h-5 text-slate-950" />
               </div>
-              <p className="text-3xl font-black text-slate-950">{stats?.totalViews.toLocaleString('id-ID')}</p>
+              <p className="text-3xl font-black text-slate-950">{(stats?.totalViews ?? 0).toLocaleString('id-ID')}</p>
               <p className="text-[11px] font-black text-slate-950">Akumulasi tayangan artikel & halaman</p>
             </RetroCard>
 
@@ -111,7 +128,7 @@ export default function AdminStatsPage() {
                 <span className="text-xs font-black uppercase tracking-wider text-slate-950">IP Pengakses Unik</span>
                 <Globe className="w-5 h-5 text-slate-950" />
               </div>
-              <p className="text-3xl font-black text-slate-950">{stats?.uniqueIPsCount}</p>
+              <p className="text-3xl font-black text-slate-950">{stats?.uniqueIPsCount ?? 0}</p>
               <p className="text-[11px] font-black text-slate-950">Unique IP address dari audit_logs</p>
             </RetroCard>
 
@@ -120,7 +137,7 @@ export default function AdminStatsPage() {
                 <span className="text-xs font-black uppercase tracking-wider text-slate-950">Admin Terautentikasi</span>
                 <Users className="w-5 h-5 text-slate-950" />
               </div>
-              <p className="text-3xl font-black text-slate-950">{stats?.activeAdmins.length}</p>
+              <p className="text-3xl font-black text-slate-950">{stats?.activeAdmins?.length ?? 0}</p>
               <p className="text-[11px] font-black text-slate-950">Pengurus terverifikasi (Super Admin & Admin)</p>
             </RetroCard>
 
@@ -129,7 +146,7 @@ export default function AdminStatsPage() {
                 <span className="text-xs font-black uppercase tracking-wider text-slate-950">Total Audit Log</span>
                 <ShieldAlert className="w-5 h-5 text-slate-950" />
               </div>
-              <p className="text-3xl font-black text-slate-950">{stats?.recentAuditLogs.length}</p>
+              <p className="text-3xl font-black text-slate-950">{stats?.recentAuditLogs?.length ?? 0}</p>
               <p className="text-[11px] font-black text-slate-950">Catatan aktivitas & percobaan login</p>
             </RetroCard>
           </div>
@@ -152,7 +169,7 @@ export default function AdminStatsPage() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {stats?.activeAdmins.map((admin: any, idx: number) => (
+                {stats?.activeAdmins?.map((admin: any, idx: number) => (
                   <div
                     key={idx}
                     className="p-4 rounded-2xl bg-amber-50 border-2 border-black space-y-1.5 shadow-[2px_2px_0px_0px_#000]"
@@ -214,7 +231,7 @@ export default function AdminStatsPage() {
                       </td>
                     </tr>
                   ) : (
-                    stats?.recentAuditLogs.map((log: any) => (
+                    stats?.recentAuditLogs?.map((log: any) => (
                       <tr key={log.id} className="hover:bg-amber-50 transition-colors">
                         <td className="p-3 border font-mono text-slate-950 whitespace-nowrap">
                           {new Date(log.timestamp).toLocaleString('id-ID')}

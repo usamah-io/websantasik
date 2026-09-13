@@ -6,12 +6,13 @@ import { RetroButton } from '@/components/ui/RetroButton';
 import { Badge } from '@/components/ui/Badge';
 import { getUsersList, updateUserRoleAction, inviteAdminByEmailAction, deleteUserAction } from '@/app/actions/userActions';
 import Link from 'next/link';
-import { UserCheck, ArrowLeft, Shield, UserPlus, Mail, CheckCircle2, User as UserIcon, Trash2, ShieldAlert } from 'lucide-react';
+import { UserCheck, ArrowLeft, Shield, UserPlus, Mail, CheckCircle2, User as UserIcon, Trash2, ShieldAlert, RotateCw, AlertTriangle } from 'lucide-react';
 import { UserRole } from '@/lib/models/User';
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [updatingEmail, setUpdatingEmail] = useState<string | null>(null);
 
   // Form Invite Admin State
@@ -23,11 +24,13 @@ export default function AdminUsersPage() {
 
   const fetchUsers = async () => {
     setLoading(true);
+    setError(null);
     try {
       const data = await getUsersList();
-      setUsers(data);
+      setUsers(data || []);
     } catch (e) {
       console.error(e);
+      setError('Gagal memuat daftar pengguna dari database.');
     } finally {
       setLoading(false);
     }
@@ -246,7 +249,20 @@ export default function AdminUsersPage() {
         </div>
 
         {loading ? (
-          <p style={{ color: '#000000' }} className="text-center py-8 font-black text-black">Memuat daftar pengguna...</p>
+          <div className="py-12 text-center space-y-3">
+            <div className="w-8 h-8 border-4 border-amber-400 border-t-black rounded-full animate-spin mx-auto" />
+            <p className="font-extrabold text-slate-800 text-sm">Memuat daftar pengguna dari database...</p>
+          </div>
+        ) : error && users.length === 0 ? (
+          <div className="py-8 text-center space-y-3 bg-rose-50 border-2 border-black rounded-2xl p-6 shadow-[2px_2px_0px_0px_#000]">
+            <div className="w-10 h-10 rounded-xl bg-rose-200 border-2 border-black flex items-center justify-center mx-auto text-rose-700">
+              <AlertTriangle className="w-5 h-5" />
+            </div>
+            <p className="font-black text-rose-950 text-sm">{error}</p>
+            <RetroButton variant="primary" size="sm" onClick={fetchUsers} className="mx-auto font-black text-xs text-black">
+              <RotateCw className="w-3.5 h-3.5 mr-1 text-black" /> Coba Lagi
+            </RetroButton>
+          </div>
         ) : (
           <>
             {/* Desktop View Table with Sticky Action Column */}

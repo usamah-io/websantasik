@@ -25,19 +25,7 @@ export async function getMembersList(division?: string) {
   try {
     await connectToDatabase();
 
-    // Clean up any residual dummy members from previous seed
-    try {
-      await Member.deleteMany({
-        $or: [
-          { name: { $in: DUMMY_MEMBER_NAMES } },
-          { email: { $regex: /@santasikmalaya\.org$/i } },
-        ],
-      });
-    } catch {}
-
-    const filter: any = {
-      name: { $nin: DUMMY_MEMBER_NAMES },
-    };
+    const filter: any = {};
     if (division && division !== 'Semua') {
       filter.division = division;
     }
@@ -64,18 +52,8 @@ export async function getMembersList(division?: string) {
     return [];
   } catch (err) {
     console.warn('DB error in getMembersList:', (err as Error).message);
+    return [];
   }
-
-  let filtered = [...initialMembers];
-  if (division && division !== 'Semua') {
-    filtered = filtered.filter((m) => m.division.toLowerCase() === division.toLowerCase());
-  }
-
-  return filtered.map((item) => ({
-    ...item,
-    photoUrl: convertGoogleDriveUrl(item.photoUrl) || FALLBACK_PHOTO_URL,
-    imagePosition: (item as any).imagePosition || 'object-center',
-  }));
 }
 
 export async function createMemberAction(formData: FormData) {

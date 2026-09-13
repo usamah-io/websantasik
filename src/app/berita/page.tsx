@@ -21,9 +21,15 @@ export default function NewsPage() {
   useEffect(() => {
     async function loadNews() {
       setLoading(true);
-      const data = await getNewsList(searchQuery, selectedCategory);
-      setArticles(data);
-      setLoading(false);
+      try {
+        const data = await getNewsList(searchQuery, selectedCategory);
+        setArticles(data || []);
+      } catch (err) {
+        console.warn('Failed to load news:', err);
+        setArticles([]);
+      } finally {
+        setLoading(false);
+      }
     }
     const timer = setTimeout(loadNews, 150);
     return () => clearTimeout(timer);

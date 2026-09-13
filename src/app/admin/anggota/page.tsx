@@ -6,11 +6,12 @@ import { RetroButton } from '@/components/ui/RetroButton';
 import { Badge } from '@/components/ui/Badge';
 import { getMembersList, createMemberAction, updateMemberAction, deleteMemberAction } from '@/app/actions/memberActions';
 import Link from 'next/link';
-import { Users, Plus, Trash2, ArrowLeft, Pencil } from 'lucide-react';
+import { Users, Plus, Trash2, ArrowLeft, Pencil, RotateCw, AlertTriangle } from 'lucide-react';
 
 export default function AdminAnggotaPage() {
   const [members, setMembers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [editingMember, setEditingMember] = useState<any | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -19,9 +20,16 @@ export default function AdminAnggotaPage() {
 
   const fetchMembers = async () => {
     setLoading(true);
-    const data = await getMembersList();
-    setMembers(data);
-    setLoading(false);
+    setError(null);
+    try {
+      const data = await getMembersList();
+      setMembers(data || []);
+    } catch (err) {
+      console.warn('Failed to load members in admin:', err);
+      setError('Gagal memuat daftar pengurus dari database MongoDB Atlas.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -296,7 +304,20 @@ export default function AdminAnggotaPage() {
         </div>
 
         {loading ? (
-          <p className="text-center py-8 font-bold text-slate-600">Memuat pengurus...</p>
+          <div className="py-12 text-center space-y-3">
+            <div className="w-8 h-8 border-4 border-cyan-400 border-t-black rounded-full animate-spin mx-auto" />
+            <p className="font-extrabold text-slate-800 text-sm">Memuat data pengurus dari database...</p>
+          </div>
+        ) : error ? (
+          <div className="py-8 text-center space-y-3 bg-rose-50 border-2 border-black rounded-2xl p-6 shadow-[2px_2px_0px_0px_#000]">
+            <div className="w-10 h-10 rounded-xl bg-rose-200 border-2 border-black flex items-center justify-center mx-auto text-rose-700">
+              <AlertTriangle className="w-5 h-5" />
+            </div>
+            <p className="font-black text-rose-950 text-sm">{error}</p>
+            <RetroButton variant="primary" size="sm" onClick={fetchMembers} className="mx-auto font-black text-xs text-black">
+              <RotateCw className="w-3.5 h-3.5 mr-1 text-black" /> Coba Lagi
+            </RetroButton>
+          </div>
         ) : members.length === 0 ? (
           <div className="text-center py-12 space-y-3">
             <div className="w-12 h-12 rounded-2xl bg-amber-100 border-2 border-black flex items-center justify-center mx-auto shadow-[2px_2px_0px_0px_#000]">

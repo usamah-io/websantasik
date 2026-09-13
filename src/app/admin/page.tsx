@@ -33,17 +33,25 @@ export default async function AdminDashboardPage() {
 
   try {
     await connectToDatabase();
-    const viewsAgg = await News.aggregate([
-      { $group: { _id: null, total: { $sum: '$views' } } },
+    const [viewsRes, newsRes, membersRes, logsRes] = await Promise.allSettled([
+      News.aggregate([{ $group: { _id: null, total: { $sum: '$views' } } }]),
+      News.countDocuments(),
+      Member.countDocuments(),
+      getRecentAuditLogs(50),
     ]);
-    if (viewsAgg && viewsAgg.length > 0 && typeof viewsAgg[0].total === 'number') {
-      totalViews = viewsAgg[0].total;
-    }
-    totalNews = await News.countDocuments();
-    totalMembers = await Member.countDocuments();
 
-    const logs = await getRecentAuditLogs(50);
-    if (logs) auditLogsCount = logs.length;
+    if (viewsRes.status === 'fulfilled' && viewsRes.value && viewsRes.value.length > 0 && typeof viewsRes.value[0]?.total === 'number') {
+      totalViews = viewsRes.value[0].total;
+    }
+    if (newsRes.status === 'fulfilled') {
+      totalNews = newsRes.value;
+    }
+    if (membersRes.status === 'fulfilled') {
+      totalMembers = membersRes.value;
+    }
+    if (logsRes.status === 'fulfilled' && logsRes.value) {
+      auditLogsCount = logsRes.value.length;
+    }
   } catch (e) {
     console.warn('Dashboard stats aggregate error:', (e as Error).message);
   }

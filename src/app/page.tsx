@@ -19,10 +19,11 @@ import {
   Zap,
   Compass,
   Award,
-  BookOpen,
   Calendar,
   Eye,
   User,
+  RotateCw,
+  AlertTriangle,
 } from 'lucide-react';
 
 const FALLBACK_NEWS_IMAGE = '/images/san-activity.jpg';
@@ -31,14 +32,11 @@ export default function LandingPage() {
   const [photos, setPhotos] = useState<GalleryPhoto[]>([]);
   const [latestNews, setLatestNews] = useState<any[]>([]);
   const [loadingNews, setLoadingNews] = useState(true);
+  const [errorNews, setErrorNews] = useState<string | null>(null);
 
-  useEffect(() => {
-    getGalleryPhotos().then((fetchedPhotos) => {
-      if (fetchedPhotos && fetchedPhotos.length > 0) {
-        setPhotos(fetchedPhotos);
-      }
-    });
-
+  const fetchNews = () => {
+    setLoadingNews(true);
+    setErrorNews(null);
     getLatestNews(3)
       .then((data) => {
         if (data && Array.isArray(data)) {
@@ -49,11 +47,26 @@ export default function LandingPage() {
       })
       .catch((err) => {
         console.warn('Failed to load latest news:', err);
+        setErrorNews('Gagal memuat berita terbaru.');
         setLatestNews([]);
       })
       .finally(() => {
         setLoadingNews(false);
       });
+  };
+
+  useEffect(() => {
+    getGalleryPhotos()
+      .then((fetchedPhotos) => {
+        if (fetchedPhotos && fetchedPhotos.length > 0) {
+          setPhotos(fetchedPhotos);
+        }
+      })
+      .catch((err) => {
+        console.warn('Failed to load gallery photos:', err);
+      });
+
+    fetchNews();
   }, []);
 
   const containerVariants: Variants = {
@@ -98,10 +111,6 @@ export default function LandingPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
           {/* Left Column: Hero Text & CTA */}
           <div className="lg:col-span-7 space-y-6">
-            <Badge variant="yellow" className="bg-white text-slate-950 border-3 font-black">
-              <BookOpen className="w-4 h-4 text-slate-950" /> PLATFORM RESMI PEMUDA & KEBUDAYAAN
-            </Badge>
-
             <div className="space-y-3">
               <h1 style={{ color: '#000000' }} className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-black leading-tight">
                 SAN CHAPTER{' '}
@@ -254,6 +263,23 @@ export default function LandingPage() {
                 </div>
               </div>
             ))}
+          </div>
+        ) : errorNews ? (
+          <div className="bg-white border-3 border-black rounded-3xl p-8 md:p-12 text-center space-y-4 shadow-[4px_4px_0px_0px_#000]">
+            <div className="w-14 h-14 rounded-2xl bg-rose-100 border-2 border-black flex items-center justify-center mx-auto shadow-[2px_2px_0px_0px_#000]">
+              <AlertTriangle className="w-7 h-7 text-rose-600" />
+            </div>
+            <div className="space-y-1">
+              <h3 style={{ color: '#000000' }} className="font-black text-black text-lg md:text-xl">
+                Gagal Memuat Berita
+              </h3>
+              <p style={{ color: '#020617' }} className="text-xs md:text-sm font-bold text-slate-900 max-w-md mx-auto">
+                Terjadi kendala saat menghubungkan ke database. Silakan klik tombol di bawah untuk mencoba kembali.
+              </p>
+            </div>
+            <RetroButton variant="primary" size="sm" onClick={fetchNews} className="mx-auto font-black text-black">
+              <RotateCw className="w-4 h-4 mr-1 text-black" /> Coba Lagi
+            </RetroButton>
           </div>
         ) : latestNews.length === 0 ? (
           <div className="bg-white border-3 border-black rounded-3xl p-8 md:p-12 text-center space-y-3 shadow-[4px_4px_0px_0px_#000]">

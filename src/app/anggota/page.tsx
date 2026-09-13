@@ -24,9 +24,15 @@ export default function AnggotaPage() {
   useEffect(() => {
     async function loadMembers() {
       setLoading(true);
-      const data = await getMembersList(selectedDivision);
-      setMembers(data);
-      setLoading(false);
+      try {
+        const data = await getMembersList(selectedDivision);
+        setMembers(data || []);
+      } catch (err) {
+        console.warn('Failed to load members:', err);
+        setMembers([]);
+      } finally {
+        setLoading(false);
+      }
     }
     loadMembers();
   }, [selectedDivision]);

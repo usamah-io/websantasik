@@ -158,19 +158,28 @@ export const authOptions: NextAuthOptions = {
 
       return true;
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       const email = (user?.email || token?.email || '').toLowerCase().trim();
       if (!email) return token;
       token.email = email;
 
+      // Fast-path: Instant check against superAdmin / admin email lists (0ms latency, no DB lock)
       if (superAdminEmails.includes(email)) {
         token.role = 'super_admin';
-      } else if (adminEmails.includes(email)) {
+        if (user) token.id = (user as any).id || token.sub;
+        return token;
+      }
+      if (adminEmails.includes(email)) {
         token.role = 'admin';
-      } else if (!token.role || token.role === 'user') {
+        if (user) token.id = (user as any).id || token.sub;
+        return token;
+      }
+
+      // Only query DB if role is not yet assigned or during sign-in / profile update
+      if (!token.role || user || trigger === 'update') {
         try {
           await connectToDatabase();
-          const dbUser = await User.findOne({ email }).lean();
+          const dbUser = await User.findOne({ email }).select('role').lean();
           if (dbUser?.role) {
             token.role = dbUser.role;
           } else {

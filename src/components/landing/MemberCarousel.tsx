@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { getMembersList } from '@/app/actions/memberActions';
 import { Badge } from '@/components/ui/Badge';
 import { RetroButton } from '@/components/ui/RetroButton';
-import { Users, ArrowRight, MessageCircle, Crown } from 'lucide-react';
+import { Users, ArrowRight, MessageCircle, Crown, RotateCw, AlertTriangle } from 'lucide-react';
 import { InstagramIcon } from '@/components/ui/SocialIcons';
 
 interface MemberCardProps {
@@ -107,20 +107,31 @@ function MemberCard({ member, isClone }: MemberCardProps) {
 export function MemberCarousel() {
   const [members, setMembers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const fetchMembers = () => {
+    setLoading(true);
+    setError(null);
     getMembersList('Semua')
       .then((data) => {
         if (data && Array.isArray(data)) {
           setMembers(data);
+        } else {
+          setMembers([]);
         }
       })
       .catch((err) => {
         console.warn('Failed to load members for carousel:', err);
+        setError('Gagal memuat data pengurus dari database.');
+        setMembers([]);
       })
       .finally(() => {
         setLoading(false);
       });
+  };
+
+  useEffect(() => {
+    fetchMembers();
   }, []);
 
   // Guarantee enough cards to span wide viewports for seamless loop
@@ -177,6 +188,23 @@ export function MemberCarousel() {
               <div className="h-3 bg-slate-200 rounded-lg w-1/2" />
             </div>
           ))}
+        </div>
+      ) : error ? (
+        <div className="bg-white border-3 border-black rounded-3xl p-8 md:p-12 text-center space-y-4 shadow-[4px_4px_0px_0px_#000]">
+          <div className="w-14 h-14 rounded-2xl bg-rose-100 border-2 border-black flex items-center justify-center mx-auto shadow-[2px_2px_0px_0px_#000]">
+            <AlertTriangle className="w-7 h-7 text-rose-600" />
+          </div>
+          <div className="space-y-1">
+            <h3 style={{ color: '#000000' }} className="font-black text-black text-lg md:text-xl">
+              Gagal Memuat Data Pengurus
+            </h3>
+            <p style={{ color: '#020617' }} className="text-xs md:text-sm font-bold text-slate-900 max-w-md mx-auto">
+              Terjadi kendala saat menghubungkan ke database. Silakan klik tombol di bawah untuk mencoba kembali.
+            </p>
+          </div>
+          <RetroButton variant="primary" size="sm" onClick={fetchMembers} className="mx-auto font-black text-black">
+            <RotateCw className="w-4 h-4 mr-1 text-black" /> Coba Lagi
+          </RetroButton>
         </div>
       ) : members.length === 0 ? (
         <div className="bg-white border-3 border-black rounded-3xl p-8 md:p-12 text-center space-y-3 shadow-[4px_4px_0px_0px_#000]">

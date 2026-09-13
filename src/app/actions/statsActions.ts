@@ -18,33 +18,33 @@ export async function getAdminRealtimeStats() {
   try {
     await connectToDatabase();
 
-    // 1. Real views count from all news articles
-    const viewsAgg = await News.aggregate([
-      { $group: { _id: null, total: { $sum: '$views' } } },
+    // Run queries concurrently for fast response and resilience
+    const [viewsRes, newsRes, membersRes, usersRes] = await Promise.allSettled([
+      News.aggregate([{ $group: { _id: null, total: { $sum: '$views' } } }]),
+      News.countDocuments(),
+      Member.countDocuments(),
+      User.find({
+        $or: [
+          { role: { $in: ['super_admin', 'admin'] } },
+          { isWhitelisted: true },
+        ],
+      })
+        .sort({ lastLoginAt: -1 })
+        .limit(10)
+        .lean(),
     ]);
-    if (viewsAgg && viewsAgg.length > 0 && typeof viewsAgg[0].total === 'number') {
-      totalViews = viewsAgg[0].total;
+
+    if (viewsRes.status === 'fulfilled' && viewsRes.value.length > 0 && typeof viewsRes.value[0].total === 'number') {
+      totalViews = viewsRes.value[0].total;
     }
-
-    // 2. Real news count
-    totalNews = await News.countDocuments();
-
-    // 3. Real members count
-    totalMembers = await Member.countDocuments();
-
-    // 4. Real admin/super_admin users from MongoDB
-    const dbUsers = await User.find({
-      $or: [
-        { role: { $in: ['super_admin', 'admin'] } },
-        { isWhitelisted: true },
-      ],
-    })
-      .sort({ lastLoginAt: -1 })
-      .limit(10)
-      .lean();
-
-    if (dbUsers && dbUsers.length > 0) {
-      activeAdmins = dbUsers.map((u: any) => ({
+    if (newsRes.status === 'fulfilled') {
+      totalNews = newsRes.value;
+    }
+    if (membersRes.status === 'fulfilled') {
+      totalMembers = membersRes.value;
+    }
+    if (usersRes.status === 'fulfilled' && usersRes.value.length > 0) {
+      activeAdmins = usersRes.value.map((u: any) => ({
         email: u.email,
         name: u.name || u.email.split('@')[0],
         role: u.role || 'admin',
@@ -69,7 +69,13 @@ export async function getAdminRealtimeStats() {
   }
 
   // 5. Real audit logs from MongoDB collection audit_logs
-  const logs = await getRecentAuditLogs(25);
+  let logs: any[] = [];
+  try {
+    logs = (await getRecentAuditLogs(25)) || [];
+  } catch (e) {
+    console.warn('Error fetching audit logs in getAdminRealtimeStats:', (e as Error).message);
+  }
+
   const validIps = logs.map((l) => l.ipAddress).filter((ip) => ip && ip !== 'Unknown');
   const uniqueIPs = new Set(validIps).size;
 
