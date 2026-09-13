@@ -8,6 +8,7 @@ import { User, UserRole } from './models/User';
 const defaultSuperAdmins = [
   'san.tasikmalaya.2020@gmail.com',
   'muhammadusamahabdurrahman@gmail.com',
+  'musamahabdurrahmanabdurrahman@gmail.com',
   'admin@santasikmalaya.org',
 ];
 
