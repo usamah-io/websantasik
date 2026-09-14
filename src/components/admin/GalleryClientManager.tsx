@@ -17,7 +17,9 @@ import {
   CheckCircle,
   Loader2,
   AlertCircle,
+  Crop,
 } from 'lucide-react';
+import { ImageCropperModal } from '@/components/ui/ImageCropperModal';
 
 interface GalleryClientManagerProps {
   initialPhotos: GalleryPhoto[];
@@ -29,6 +31,28 @@ export function GalleryClientManager({ initialPhotos }: GalleryClientManagerProp
   const [showAddForm, setShowAddForm] = useState(false);
   const [uploadMode, setUploadMode] = useState<'file' | 'url'>('file');
   const [statusMsg, setStatusMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  // Image Cropper States
+  const [cropperOpen, setCropperOpen] = useState(false);
+  const [rawImageSrc, setRawImageSrc] = useState<string | null>(null);
+  const [croppedFile, setCroppedFile] = useState<File | null>(null);
+  const [croppedPreview, setCroppedPreview] = useState<string | null>(null);
+  const [selectedFileName, setSelectedFileName] = useState<string>('gallery.jpg');
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFileName(file.name);
+      const objUrl = URL.createObjectURL(file);
+      setRawImageSrc(objUrl);
+      setCropperOpen(true);
+    }
+  };
+
+  const handleCropComplete = (result: { file: File; blob: Blob; url: string }) => {
+    setCroppedFile(result.file);
+    setCroppedPreview(result.url);
+  };
 
   const handleDelete = (id: string, title: string) => {
     if (!confirm(`Apakah Anda yakin ingin menghapus foto "${title}" dari slideshow?`)) {
@@ -53,6 +77,14 @@ export function GalleryClientManager({ initialPhotos }: GalleryClientManagerProp
     const form = e.currentTarget;
     const formData = new FormData(form);
 
+    if (uploadMode === 'file') {
+      if (!croppedFile) {
+        alert('Silakan pilih dan sesuaikan (crop) gambar terlebih dahulu.');
+        return;
+      }
+      formData.set('image', croppedFile);
+    }
+
     startTransition(async () => {
       try {
         const res = await addGalleryPhotoAction(formData);
@@ -64,12 +96,15 @@ export function GalleryClientManager({ initialPhotos }: GalleryClientManagerProp
           const newPhoto: GalleryPhoto = {
             id: res.id,
             title,
-            imageUrl: imageUrlInput || '/images/foto1.jpg',
+            imageUrl: croppedPreview || imageUrlInput || '/images/foto1.jpg',
             caption,
           };
 
           setPhotos((prev) => [newPhoto, ...prev]);
           setShowAddForm(false);
+          setCroppedFile(null);
+          setCroppedPreview(null);
+          setRawImageSrc(null);
           form.reset();
           setStatusMsg({ type: 'success', text: `Foto "${title}" berhasil ditambahkan!` });
         }
@@ -189,15 +224,41 @@ export function GalleryClientManager({ initialPhotos }: GalleryClientManagerProp
             </div>
 
             {uploadMode === 'file' ? (
-              <div className="space-y-1">
-                <label className="block text-xs font-black text-slate-950 uppercase">Pilih Gambar (Otomatis ke Cloudinary)</label>
+              <div className="space-y-2">
+                <label className="block text-xs font-black text-slate-950 uppercase">
+                  Pilih & Edit Gambar (Cropper Interaktif)
+                </label>
                 <input
                   type="file"
-                  name="image"
                   accept="image/*"
-                  required
-                  className="w-full px-4 py-2 rounded-xl bg-slate-100 border-2 border-black text-sm font-bold text-slate-950 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-2 file:border-black file:bg-amber-400 file:text-xs file:font-black"
+                  onChange={handleFileSelect}
+                  className="w-full px-4 py-2 rounded-xl bg-slate-100 border-2 border-black text-sm font-bold text-slate-950 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-2 file:border-black file:bg-amber-400 file:text-xs file:font-black cursor-pointer"
                 />
+
+                {croppedPreview && (
+                  <div className="p-3 bg-amber-50/90 border-2 border-black rounded-2xl space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-black uppercase text-slate-950 flex items-center gap-1.5">
+                        <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
+                        Pratinjau Hasil Crop (Proporsional):
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setCropperOpen(true)}
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white border border-black text-xs font-black text-slate-950 hover:bg-amber-300 shadow-[1.5px_1.5px_0px_0px_#000] cursor-pointer"
+                      >
+                        <Crop className="w-3 h-3" /> Edit / Crop Ulang
+                      </button>
+                    </div>
+                    <div className="relative aspect-video w-full rounded-xl border-2 border-black overflow-hidden bg-slate-950 shadow-[2px_2px_0px_0px_#000]">
+                      <img
+                        src={croppedPreview}
+                        alt="Hasil Crop"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="space-y-1">
@@ -284,6 +345,19 @@ export function GalleryClientManager({ initialPhotos }: GalleryClientManagerProp
           </RetroCard>
         ))}
       </div>
+
+      {/* Image Cropper Modal */}
+      <ImageCropperModal
+        isOpen={cropperOpen}
+        imageSrc={rawImageSrc}
+        fileName={selectedFileName}
+        cropShape="rect"
+        initialAspect={16 / 9}
+        allowAspectRatioChange={true}
+        title="Sesuaikan Foto Dokumentasi Galeri"
+        onClose={() => setCropperOpen(false)}
+        onCropComplete={handleCropComplete}
+      />
     </div>
   );
 }

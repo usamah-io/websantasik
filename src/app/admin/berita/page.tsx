@@ -6,7 +6,8 @@ import { RetroButton } from '@/components/ui/RetroButton';
 import { Badge } from '@/components/ui/Badge';
 import { getNewsList, createNewsAction, updateNewsAction, deleteNewsAction } from '@/app/actions/newsActions';
 import Link from 'next/link';
-import { Newspaper, Plus, Trash2, ArrowLeft, Eye, Pencil, Image as ImageIcon, X, RotateCw, AlertTriangle } from 'lucide-react';
+import { Newspaper, Plus, Trash2, ArrowLeft, Eye, Pencil, Image as ImageIcon, X, RotateCw, AlertTriangle, Crop, CheckCircle } from 'lucide-react';
+import { ImageCropperModal } from '@/components/ui/ImageCropperModal';
 
 const FALLBACK_NEWS_IMAGE = '/images/san-activity.jpg';
 
@@ -19,6 +20,12 @@ export default function AdminBeritaPage() {
   const [submitting, setSubmitting] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [additionalImages, setAdditionalImages] = useState<string[]>([]);
+
+  // Cropper states
+  const [cropperOpen, setCropperOpen] = useState(false);
+  const [rawImageSrc, setRawImageSrc] = useState<string | null>(null);
+  const [croppedFile, setCroppedFile] = useState<File | null>(null);
+  const [selectedFileName, setSelectedFileName] = useState<string>('berita.jpg');
 
   const fetchNews = async () => {
     setLoading(true);
@@ -42,6 +49,8 @@ export default function AdminBeritaPage() {
     setEditingArticle(null);
     setAdditionalImages([]);
     setImagePreview(null);
+    setCroppedFile(null);
+    setRawImageSrc(null);
     setShowModal(true);
   };
 
@@ -49,18 +58,24 @@ export default function AdminBeritaPage() {
     setEditingArticle(article);
     setAdditionalImages(article.images || []);
     setImagePreview(article.imageUrl || null);
+    setCroppedFile(null);
+    setRawImageSrc(null);
     setShowModal(true);
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      setSelectedFileName(file.name);
+      const url = URL.createObjectURL(file);
+      setRawImageSrc(url);
+      setCropperOpen(true);
     }
+  };
+
+  const handleCropComplete = (result: { file: File; blob: Blob; url: string }) => {
+    setCroppedFile(result.file);
+    setImagePreview(result.url);
   };
 
   const handleAddImageInput = () => {
@@ -84,6 +99,10 @@ export default function AdminBeritaPage() {
     setSubmitting(true);
     const formData = new FormData(e.currentTarget);
 
+    if (croppedFile) {
+      formData.set('image', croppedFile);
+    }
+
     try {
       let res;
       if (editingArticle) {
@@ -97,6 +116,8 @@ export default function AdminBeritaPage() {
         setShowModal(false);
         setEditingArticle(null);
         setImagePreview(null);
+        setCroppedFile(null);
+        setRawImageSrc(null);
         setAdditionalImages([]);
         fetchNews();
       } else {
@@ -197,21 +218,42 @@ export default function AdminBeritaPage() {
                 </div>
               </div>
 
-              {/* Cloudinary Image File Upload */}
-              <div>
-                <label className="block font-black text-slate-950 mb-1 uppercase text-xs">
-                  Atau Unggah Berkas Sampul:
-                </label>
+              {/* Cover Image Upload with Interactive Cropper */}
+              <div className="space-y-2 p-3 sm:p-4 rounded-2xl bg-amber-50/90 border-2 border-black">
+                <div className="flex items-center justify-between">
+                  <label className="block font-black text-slate-950 uppercase text-xs flex items-center gap-1.5">
+                    <ImageIcon className="w-3.5 h-3.5 text-amber-700" />
+                    <span>Unggah Berkas Sampul (Cropper Interaktif):</span>
+                  </label>
+                  {imagePreview && rawImageSrc && (
+                    <button
+                      type="button"
+                      onClick={() => setCropperOpen(true)}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white border border-black text-xs font-black text-slate-950 hover:bg-amber-300 shadow-[1.5px_1.5px_0px_0px_#000] cursor-pointer"
+                    >
+                      <Crop className="w-3 h-3" /> Edit / Crop Ulang
+                    </button>
+                  )}
+                </div>
+
                 <input
                   type="file"
-                  name="image"
                   accept="image/*"
                   onChange={handleImageChange}
-                  className="w-full text-xs text-slate-950 font-extrabold bg-slate-50 border-2 border-black rounded-xl p-2 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-2 file:border-black file:text-xs file:font-black file:bg-amber-400 hover:file:bg-amber-300 cursor-pointer"
+                  className="w-full text-xs text-slate-950 font-extrabold bg-white border-2 border-black rounded-xl p-2 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-2 file:border-black file:text-xs file:font-black file:bg-amber-400 hover:file:bg-amber-300 cursor-pointer"
                 />
+
                 {imagePreview && (
-                  <div className="mt-2 h-32 w-full rounded-xl border-2 border-black overflow-hidden bg-slate-100">
-                    <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                  <div className="space-y-1.5 pt-1">
+                    <div className="flex items-center justify-between text-[11px] font-black text-slate-900">
+                      <span className="flex items-center gap-1">
+                        <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
+                        Pratinjau Sampul Berita (16:9 / Proporsional):
+                      </span>
+                    </div>
+                    <div className="relative aspect-video w-full rounded-xl border-2 border-black overflow-hidden bg-slate-950 shadow-[2px_2px_0px_0px_#000]">
+                      <img src={imagePreview} alt="Preview Sampul" className="w-full h-full object-cover" />
+                    </div>
                   </div>
                 )}
               </div>
@@ -391,6 +433,19 @@ export default function AdminBeritaPage() {
           </div>
         )}
       </RetroCard>
+
+      {/* Image Cropper Modal */}
+      <ImageCropperModal
+        isOpen={cropperOpen}
+        imageSrc={rawImageSrc}
+        fileName={selectedFileName}
+        cropShape="rect"
+        initialAspect={16 / 9}
+        allowAspectRatioChange={true}
+        title="Sesuaikan Sampul Berita (Cropper Interaktif)"
+        onClose={() => setCropperOpen(false)}
+        onCropComplete={handleCropComplete}
+      />
     </div>
   );
 }

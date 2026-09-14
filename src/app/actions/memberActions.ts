@@ -6,6 +6,7 @@ import { Member } from '@/lib/models/Member';
 import { recordAuditLog } from '@/lib/audit';
 import { requireAdminSession } from '@/lib/auth';
 import { convertGoogleDriveUrl } from '@/lib/imageUtils';
+import { uploadImageToCloudinary } from '@/lib/cloudinary';
 
 const FALLBACK_PHOTO_URL = '/images/san-activity.jpg';
 const DUMMY_MEMBER_NAMES = [
@@ -73,7 +74,17 @@ export async function createMemberAction(formData: FormData) {
     return { success: false, error: 'Nama dan jabatan/role wajib diisi.' };
   }
 
-  const finalPhotoUrl = convertGoogleDriveUrl(photoUrlInput) || FALLBACK_PHOTO_URL;
+  const imageFile = formData.get('image') as File | null;
+  let finalPhotoUrl = FALLBACK_PHOTO_URL;
+
+  if (imageFile && imageFile.size > 0 && imageFile.name) {
+    const bytes = await imageFile.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+    finalPhotoUrl = await uploadImageToCloudinary(buffer, imageFile.name);
+  } else if (photoUrlInput && photoUrlInput.trim() !== '') {
+    finalPhotoUrl = convertGoogleDriveUrl(photoUrlInput);
+  }
+
   let createdId = 'mem-' + Date.now();
 
   try {
@@ -147,22 +158,33 @@ export async function updateMemberAction(formData: FormData) {
     return { success: false, error: 'ID, Nama, dan Jabatan wajib diisi.' };
   }
 
-  const finalPhotoUrl = convertGoogleDriveUrl(photoUrlInput) || FALLBACK_PHOTO_URL;
+  const imageFile = formData.get('image') as File | null;
+  let finalPhotoUrl = photoUrlInput && photoUrlInput.trim() !== '' ? convertGoogleDriveUrl(photoUrlInput) : undefined;
+
+  if (imageFile && imageFile.size > 0 && imageFile.name) {
+    const bytes = await imageFile.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+    finalPhotoUrl = await uploadImageToCloudinary(buffer, imageFile.name);
+  }
 
   try {
     await connectToDatabase();
-    await Member.findByIdAndUpdate(id, {
+    const updateData: any = {
       name,
       role,
       division,
-      photoUrl: finalPhotoUrl,
       bio,
       email,
       instagram,
       linkedin,
       whatsapp,
       imagePosition,
-    });
+    };
+    if (finalPhotoUrl) {
+      updateData.photoUrl = finalPhotoUrl;
+    }
+
+    await Member.findByIdAndUpdate(id, updateData);
 
     await recordAuditLog({
       email: session.user.email,
@@ -177,7 +199,7 @@ export async function updateMemberAction(formData: FormData) {
         name,
         role,
         division,
-        photoUrl: finalPhotoUrl,
+        ...(finalPhotoUrl ? { photoUrl: finalPhotoUrl } : {}),
         bio,
         email,
         instagram,
