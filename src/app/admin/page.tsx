@@ -21,7 +21,7 @@ export default async function AdminDashboardPage() {
   const role = (session.user as any)?.role || 'user';
 
   if (role === 'user') {
-    redirect('/admin/login?error=AccessDenied');
+    redirect('/');
   }
 
   const isSuperAdmin = role === 'super_admin';

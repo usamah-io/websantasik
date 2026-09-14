@@ -35,6 +35,14 @@ export async function proxy(req: NextRequest) {
 
     const userRole = (token as any)?.role || 'user';
 
+    // If already authenticated and accessing login portal, redirect based on role
+    if ((path === '/admin/login' || path === '/login') && token) {
+      if (userRole === 'super_admin' || userRole === 'admin') {
+        return NextResponse.redirect(new URL('/admin', req.url));
+      }
+      return NextResponse.redirect(new URL('/', req.url));
+    }
+
     // If not authenticated, redirect to login with return callbackUrl
     if (!token) {
       const loginUrl = new URL('/admin/login', req.url);
@@ -42,12 +50,9 @@ export async function proxy(req: NextRequest) {
       return NextResponse.redirect(loginUrl);
     }
 
-    // If logged in as regular user without admin rights
+    // If logged in as regular user without admin rights, seamlessly redirect to homepage
     if (userRole !== 'super_admin' && userRole !== 'admin') {
-      const loginUrl = new URL('/admin/login', req.url);
-      loginUrl.searchParams.set('error', 'AccessDenied');
-      loginUrl.searchParams.set('callbackUrl', path);
-      return NextResponse.redirect(loginUrl);
+      return NextResponse.redirect(new URL('/', req.url));
     }
 
     // Super Admin only routes: /admin/stats and /admin/users
@@ -68,5 +73,5 @@ export async function proxy(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*'],
+  matcher: ['/admin/:path*', '/login'],
 };
