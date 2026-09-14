@@ -32,6 +32,11 @@ export default function AdminStatsPage() {
   const fetchStats = async () => {
     setRefreshing(true);
     setError(null);
+    const timeoutId = setTimeout(() => {
+      setLoading(false);
+      setRefreshing(false);
+    }, 8000);
+
     try {
       const data = await getAdminRealtimeStats();
       setStats(data);
@@ -39,6 +44,7 @@ export default function AdminStatsPage() {
       console.error(e);
       setError('Gagal memuat statistik real-time dari database MongoDB Atlas.');
     } finally {
+      clearTimeout(timeoutId);
       setLoading(false);
       setRefreshing(false);
     }
@@ -46,7 +52,7 @@ export default function AdminStatsPage() {
 
   useEffect(() => {
     fetchStats();
-    const interval = setInterval(fetchStats, 15000);
+    const interval = setInterval(fetchStats, 20000);
     return () => clearInterval(interval);
   }, []);
 
@@ -54,7 +60,7 @@ export default function AdminStatsPage() {
     <div className="space-y-8 py-4">
       {/* Top Banner */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
+        <div className="space-y-2 min-w-0 max-w-full">
           <Link href="/admin">
             <span className="text-xs font-black text-slate-800 hover:text-amber-600 flex items-center gap-1 mb-1">
               <ArrowLeft className="w-3.5 h-3.5" /> Kembali ke Dashboard
@@ -64,18 +70,28 @@ export default function AdminStatsPage() {
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-950">
               Panel Statistik & Audit Log Real-Time
             </h1>
-            <Badge variant="green" className="bg-emerald-300 text-slate-950 font-black">
+            <Badge variant="green" className="bg-emerald-300 text-slate-950 font-black whitespace-nowrap shrink-0">
               LIVE
             </Badge>
           </div>
           {/* Prominently show current authenticated Google account */}
-          <div className="flex flex-wrap items-center gap-2 pt-2">
-            <div className="flex items-center gap-2 bg-amber-100 border-2 border-black rounded-xl px-3 py-1.5 text-xs font-black text-slate-950 shadow-[2px_2px_0px_0px_#000]">
-              <UserCheck className="w-4 h-4 text-emerald-700 shrink-0" />
-              <span>Akun Login:</span>
-              <span className="font-mono text-cyan-950 underline">{session?.user?.email || 'Memuat email...'}</span>
-              <Badge variant="purple" className="text-[10px] py-0.5 px-2 uppercase font-black">
-                {(session?.user as any)?.role?.replace('_', ' ') || 'SUPER ADMIN'}
+          <div className="pt-1 max-w-full">
+            <div className="inline-flex flex-wrap items-center gap-1.5 sm:gap-2 bg-amber-100 border-2 border-black rounded-xl px-3 py-1.5 text-xs font-black text-slate-950 shadow-[2px_2px_0px_0px_#000] max-w-full">
+              <div className="flex items-center gap-1.5 shrink-0">
+                <UserCheck className="w-4 h-4 text-emerald-700 shrink-0" />
+                <span className="shrink-0 text-slate-900">Akun:</span>
+              </div>
+              <span
+                className="font-mono text-cyan-950 underline truncate max-w-[170px] xs:max-w-[240px] sm:max-w-[340px] md:max-w-md text-[11px] sm:text-xs"
+                title={session?.user?.email || ''}
+              >
+                {session?.user?.email || 'Memuat email...'}
+              </span>
+              <Badge
+                variant="purple"
+                className="text-[10px] py-0.5 px-2 uppercase font-black whitespace-nowrap shrink-0 tracking-wide"
+              >
+                {(session?.user as any)?.role === 'super_admin' ? 'SUPER ADMIN' : ((session?.user as any)?.role?.replace('_', ' ').toUpperCase() || 'SUPER ADMIN')}
               </Badge>
             </div>
           </div>
@@ -86,7 +102,7 @@ export default function AdminStatsPage() {
           size="sm"
           onClick={fetchStats}
           disabled={refreshing}
-          className="bg-white"
+          className="bg-white w-full sm:w-auto justify-center whitespace-nowrap"
         >
           <RotateCw className={`w-4 h-4 text-slate-950 ${refreshing ? 'animate-spin' : ''}`} /> Refresh Data
         </RetroButton>
@@ -116,7 +132,7 @@ export default function AdminStatsPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <RetroCard badgeBg="bg-amber-300 text-slate-950" animateHover={false} className="space-y-2">
               <div className="flex items-center justify-between text-slate-950">
-                <span className="text-xs font-black uppercase tracking-wider text-slate-950">Total Views & Views</span>
+                <span className="text-xs font-black uppercase tracking-wider text-slate-950">Total Tayangan</span>
                 <Eye className="w-5 h-5 text-slate-950" />
               </div>
               <p className="text-3xl font-black text-slate-950">{(stats?.totalViews ?? 0).toLocaleString('id-ID')}</p>
@@ -158,8 +174,8 @@ export default function AdminStatsPage() {
                 <CheckCircle2 className="w-5 h-5 text-emerald-600" />
                 <h3 className="text-xl font-black text-slate-950">Daftar Admin Logged-In & Peran RBAC</h3>
               </div>
-              <Badge variant="green" className="text-slate-950 font-black">
-                MongoDB User Collection
+              <Badge variant="green" className="text-slate-950 font-black text-xs whitespace-nowrap shrink-0">
+                MONGODB
               </Badge>
             </div>
 
@@ -174,13 +190,13 @@ export default function AdminStatsPage() {
                     key={idx}
                     className="p-4 rounded-2xl bg-amber-50 border-2 border-black space-y-1.5 shadow-[2px_2px_0px_0px_#000]"
                   >
-                    <div className="flex items-center justify-between">
-                      <span className="font-black text-slate-950 text-sm">{admin.name}</span>
-                      <Badge variant={admin.role === 'super_admin' ? 'purple' : 'yellow'} className="text-[10px] text-slate-950 font-black">
-                        {admin.role === 'super_admin' ? 'Super Admin' : 'Admin'}
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-black text-slate-950 text-sm truncate">{admin.name}</span>
+                      <Badge variant={admin.role === 'super_admin' ? 'purple' : 'yellow'} className="text-[10px] text-slate-950 font-black whitespace-nowrap shrink-0">
+                        {admin.role === 'super_admin' ? 'SUPER ADMIN' : 'ADMIN'}
                       </Badge>
                     </div>
-                    <p className="text-xs font-black text-slate-800">{admin.email}</p>
+                    <p className="text-xs font-black text-slate-800 font-mono truncate" title={admin.email}>{admin.email}</p>
                     <div className="flex items-center justify-between text-[11px] font-bold text-slate-700 pt-1 border-t border-amber-200">
                       <span className="flex items-center gap-1 font-mono text-slate-950 font-bold">
                         <Globe className="w-3 h-3 text-cyan-800" /> IP: {admin.lastIp}
@@ -207,8 +223,8 @@ export default function AdminStatsPage() {
                   Data langsung dari MongoDB koleksi <code className="font-mono bg-slate-100 px-1.5 py-0.5 border border-black rounded text-slate-950 font-black">audit_logs</code>
                 </p>
               </div>
-              <Badge variant="purple" className="text-slate-950 font-black">
-                MongoDB Collection
+              <Badge variant="purple" className="text-slate-950 font-black text-xs whitespace-nowrap shrink-0">
+                MONGODB
               </Badge>
             </div>
 
@@ -236,7 +252,9 @@ export default function AdminStatsPage() {
                         <td className="p-3 border font-mono text-slate-950 whitespace-nowrap">
                           {new Date(log.timestamp).toLocaleString('id-ID')}
                         </td>
-                        <td className="p-3 border font-black text-slate-950">{log.email}</td>
+                        <td className="p-3 border font-black font-mono text-slate-950 truncate max-w-[190px]" title={log.email}>
+                          {log.email}
+                        </td>
                         <td className="p-3 border font-mono font-black text-cyan-900">
                           {log.ipAddress}
                         </td>

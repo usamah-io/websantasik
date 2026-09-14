@@ -300,7 +300,7 @@ export default function AdminAnggotaPage() {
           <h3 className="text-lg sm:text-xl font-black text-slate-950">
             Daftar Pengurus ({members.length})
           </h3>
-          <Badge variant="blue" className="text-xs">MongoDB Member Collection</Badge>
+          <Badge variant="blue" className="text-xs whitespace-nowrap shrink-0">MONGODB</Badge>
         </div>
 
         {loading ? (

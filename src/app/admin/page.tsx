@@ -62,25 +62,31 @@ export default async function AdminDashboardPage() {
       <div className="bg-amber-400 border-4 border-black rounded-3xl p-5 sm:p-6 md:p-8 shadow-[6px_6px_0px_0px_#000] flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div className="space-y-2">
           <div className="flex flex-wrap items-center gap-2">
-            <Badge variant="yellow" className="bg-white text-slate-950 font-black text-xs">
+            <Badge variant="yellow" className="bg-white text-slate-950 font-black text-xs whitespace-nowrap shrink-0">
               <ShieldCheck className="w-4 h-4 text-slate-950 shrink-0" /> AREA TERPROTEKSI
             </Badge>
-            <Badge variant={isSuperAdmin ? 'purple' : 'green'} className="text-slate-950 font-black text-xs uppercase">
+            <Badge variant={isSuperAdmin ? 'purple' : 'green'} className="text-slate-950 font-black text-xs uppercase whitespace-nowrap shrink-0">
               {isSuperAdmin ? 'SUPER ADMIN' : 'REGULAR ADMIN'}
             </Badge>
           </div>
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-950 tracking-tight">
             Selamat Datang di Portal Admin
           </h1>
-          <div className="flex items-center gap-2.5 pt-1">
+          <div className="flex items-center gap-2.5 pt-1 min-w-0 max-w-full">
             <img
               src={session.user.image || 'https://api.dicebear.com/7.x/bottts/svg?seed=' + session.user.email}
               alt="Avatar"
-              className="w-7 h-7 rounded-full border-2 border-black"
+              className="w-7 h-7 rounded-full border-2 border-black shrink-0"
             />
-            <div className="text-xs sm:text-sm font-extrabold text-slate-950">
-              Akun: <span className="font-mono underline font-black">{session.user.email}</span> • Hak Akses:{' '}
-              <span className="uppercase font-black">{role.replace('_', ' ')}</span>
+            <div className="text-xs sm:text-sm font-extrabold text-slate-950 flex flex-wrap items-center gap-x-1.5 min-w-0">
+              <span>Akun:</span>
+              <span className="font-mono underline font-black truncate max-w-[190px] xs:max-w-[260px] sm:max-w-xs md:max-w-md" title={session.user.email || ''}>
+                {session.user.email}
+              </span>
+              <span className="hidden xs:inline">•</span>
+              <span className="whitespace-nowrap">
+                Hak Akses: <strong className="uppercase font-black">{role.replace('_', ' ')}</strong>
+              </span>
             </div>
           </div>
         </div>
@@ -88,13 +94,13 @@ export default async function AdminDashboardPage() {
         <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
           <Link href="/admin/settings" className="flex-1 md:flex-none">
             <RetroButton variant="outline" size="md" className="w-full justify-center text-sm font-black whitespace-nowrap bg-white">
-              <Settings className="w-5 h-5 text-slate-950 shrink-0" /> Pengaturan Jejaring
+              <Settings className="w-5 h-5 text-slate-950 shrink-0" /> Pengaturan
             </RetroButton>
           </Link>
           {isSuperAdmin && (
             <Link href="/admin/users" className="flex-1 md:flex-none">
               <RetroButton variant="accent" size="md" className="w-full justify-center text-sm font-black whitespace-nowrap">
-                <UserCheck className="w-5 h-5 text-slate-950 shrink-0" /> Kelola Admin & User
+                <UserCheck className="w-5 h-5 text-slate-950 shrink-0" /> Kelola Admin
               </RetroButton>
             </Link>
           )}
@@ -116,7 +122,7 @@ export default async function AdminDashboardPage() {
           <h2 className="text-xl font-black text-slate-950 uppercase tracking-tight">
             Akses Cepat Manajemen Modul
           </h2>
-          <Badge variant="yellow">Navigasi Utama</Badge>
+          <Badge variant="yellow" className="whitespace-nowrap shrink-0">Navigasi Utama</Badge>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -129,7 +135,7 @@ export default async function AdminDashboardPage() {
                 </div>
                 <div className="flex items-center justify-between gap-2">
                   <h3 className="text-xl sm:text-2xl font-black text-slate-950">Statistik & Audit</h3>
-                  <Badge variant="purple" className="text-[10px] shrink-0">Super Admin</Badge>
+                  <Badge variant="purple" className="text-[10px] shrink-0 whitespace-nowrap">Super Admin</Badge>
                 </div>
                 <p className="text-xs font-extrabold text-slate-950 leading-relaxed">
                   Pantau statistik tayangan real-time, admin terautentikasi, dan riwayat IP security logs dari koleksi MongoDB.
@@ -152,7 +158,7 @@ export default async function AdminDashboardPage() {
                   Akses log audit sistem dan statistik keamanan IP khusus untuk peranan <strong className="text-purple-950 font-black">Super Admin</strong>.
                 </p>
               </div>
-              <Badge variant="dark" className="w-fit text-[10px]">Khusus Super Admin</Badge>
+              <Badge variant="dark" className="w-fit text-[10px] whitespace-nowrap shrink-0">Khusus Super Admin</Badge>
             </RetroCard>
           )}
 

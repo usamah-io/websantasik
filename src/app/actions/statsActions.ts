@@ -16,22 +16,32 @@ export async function getAdminRealtimeStats() {
   let activeAdmins: Array<{ email: string; name: string; role: string; lastIp: string; lastLogin: string }> = [];
 
   try {
-    await connectToDatabase();
+    const dbQueryPromise = (async () => {
+      await connectToDatabase();
+      return await Promise.allSettled([
+        News.aggregate([{ $group: { _id: null, total: { $sum: '$views' } } }]),
+        News.countDocuments(),
+        Member.countDocuments(),
+        User.find({
+          $or: [
+            { role: { $in: ['super_admin', 'admin'] } },
+            { isWhitelisted: true },
+          ],
+        })
+          .sort({ lastLoginAt: -1 })
+          .limit(10)
+          .lean(),
+      ]);
+    })();
 
-    // Run queries concurrently for fast response and resilience
-    const [viewsRes, newsRes, membersRes, usersRes] = await Promise.allSettled([
-      News.aggregate([{ $group: { _id: null, total: { $sum: '$views' } } }]),
-      News.countDocuments(),
-      Member.countDocuments(),
-      User.find({
-        $or: [
-          { role: { $in: ['super_admin', 'admin'] } },
-          { isWhitelisted: true },
-        ],
-      })
-        .sort({ lastLoginAt: -1 })
-        .limit(10)
-        .lean(),
+    const timeoutGuard = new Promise<never>((_, reject) => {
+      const timer = setTimeout(() => reject(new Error('Query database timeout')), 4000);
+      if (typeof timer.unref === 'function') timer.unref();
+    });
+
+    const [viewsRes, newsRes, membersRes, usersRes] = await Promise.race([
+      dbQueryPromise,
+      timeoutGuard,
     ]);
 
     if (viewsRes.status === 'fulfilled' && viewsRes.value.length > 0 && typeof viewsRes.value[0].total === 'number') {

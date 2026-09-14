@@ -242,9 +242,9 @@ export default function AdminUsersPage() {
           </h3>
           <span
             style={{ color: '#000000', backgroundColor: '#fde047' }}
-            className="inline-flex items-center px-2.5 py-0.5 text-xs font-black rounded-full border-2 border-black shadow-[1px_1px_0px_0px_#000] uppercase text-black bg-yellow-300"
+            className="inline-flex items-center px-2.5 py-0.5 text-xs font-black rounded-full border-2 border-black shadow-[1px_1px_0px_0px_#000] uppercase text-black bg-yellow-300 whitespace-nowrap shrink-0"
           >
-            MongoDB User Collection
+            MONGODB
           </span>
         </div>
 
@@ -295,21 +295,21 @@ export default function AdminUsersPage() {
                         {u.role === 'super_admin' ? (
                           <span
                             style={{ color: '#000000', backgroundColor: '#d8b4fe' }}
-                            className="inline-flex items-center px-3 py-1 text-xs font-black rounded-full border-2 border-black shadow-[1.5px_1.5px_0px_0px_#000] tracking-wider text-black uppercase"
+                            className="inline-flex items-center px-3 py-1 text-xs font-black rounded-full border-2 border-black shadow-[1.5px_1.5px_0px_0px_#000] tracking-wider text-black uppercase whitespace-nowrap shrink-0"
                           >
                             SUPER ADMIN
                           </span>
                         ) : u.role === 'admin' ? (
                           <span
                             style={{ color: '#000000', backgroundColor: '#6ee7b7' }}
-                            className="inline-flex items-center px-3 py-1 text-xs font-black rounded-full border-2 border-black shadow-[1.5px_1.5px_0px_0px_#000] tracking-wider text-black uppercase"
+                            className="inline-flex items-center px-3 py-1 text-xs font-black rounded-full border-2 border-black shadow-[1.5px_1.5px_0px_0px_#000] tracking-wider text-black uppercase whitespace-nowrap shrink-0"
                           >
                             ADMIN (EDITOR)
                           </span>
                         ) : (
                           <span
                             style={{ color: '#000000', backgroundColor: '#fde047' }}
-                            className="inline-flex items-center px-3 py-1 text-xs font-black rounded-full border-2 border-black shadow-[1.5px_1.5px_0px_0px_#000] tracking-wider text-black uppercase"
+                            className="inline-flex items-center px-3 py-1 text-xs font-black rounded-full border-2 border-black shadow-[1.5px_1.5px_0px_0px_#000] tracking-wider text-black uppercase whitespace-nowrap shrink-0"
                           >
                             USER
                           </span>
@@ -396,21 +396,21 @@ export default function AdminUsersPage() {
                     {u.role === 'super_admin' ? (
                       <span
                         style={{ color: '#000000', backgroundColor: '#d8b4fe' }}
-                        className="inline-flex items-center px-2 py-0.5 text-[10px] font-black rounded-full border-2 border-black shadow-[1px_1px_0px_0px_#000] text-black shrink-0 uppercase"
+                        className="inline-flex items-center px-2 py-0.5 text-[10px] font-black rounded-full border-2 border-black shadow-[1px_1px_0px_0px_#000] text-black shrink-0 uppercase whitespace-nowrap"
                       >
                         SUPER ADMIN
                       </span>
                     ) : u.role === 'admin' ? (
                       <span
                         style={{ color: '#000000', backgroundColor: '#6ee7b7' }}
-                        className="inline-flex items-center px-2 py-0.5 text-[10px] font-black rounded-full border-2 border-black shadow-[1px_1px_0px_0px_#000] text-black shrink-0 uppercase"
+                        className="inline-flex items-center px-2 py-0.5 text-[10px] font-black rounded-full border-2 border-black shadow-[1px_1px_0px_0px_#000] text-black shrink-0 uppercase whitespace-nowrap"
                       >
                         ADMIN
                       </span>
                     ) : (
                       <span
                         style={{ color: '#000000', backgroundColor: '#fde047' }}
-                        className="inline-flex items-center px-2 py-0.5 text-[10px] font-black rounded-full border-2 border-black shadow-[1px_1px_0px_0px_#000] text-black shrink-0 uppercase"
+                        className="inline-flex items-center px-2 py-0.5 text-[10px] font-black rounded-full border-2 border-black shadow-[1px_1px_0px_0px_#000] text-black shrink-0 uppercase whitespace-nowrap"
                       >
                         USER
                       </span>

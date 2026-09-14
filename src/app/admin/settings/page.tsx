@@ -72,7 +72,7 @@ export default function AdminSettingsPage() {
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-950">
               Pengaturan Jejaring Sosial & Kontak
             </h1>
-            <Badge variant="yellow" className="text-xs shrink-0">MongoDB Settings</Badge>
+            <Badge variant="yellow" className="text-xs shrink-0 whitespace-nowrap">MONGODB</Badge>
           </div>
         </div>
       </div>

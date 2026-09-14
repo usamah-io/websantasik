@@ -14,8 +14,8 @@ export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const publicNavLinks = [
-    { name: 'Berita & Warta', href: '/berita', icon: FileText },
-    { name: 'Direktori Anggota', href: '/anggota', icon: Users },
+    { name: 'Berita', href: '/berita', icon: FileText },
+    { name: 'Anggota', href: '/anggota', icon: Users },
   ];
 
   return (
@@ -135,20 +135,35 @@ export function Navbar() {
 
             {session ? (
               <div className="pt-2 flex flex-col gap-2">
+                <div className="flex items-center gap-2.5 p-2.5 rounded-xl bg-white border-2 border-black shadow-[2px_2px_0px_0px_#000]">
+                  <img
+                    src={session.user?.image || 'https://api.dicebear.com/7.x/bottts/svg?seed=admin'}
+                    alt="Avatar"
+                    className="w-7 h-7 rounded-full border border-black shrink-0"
+                  />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs font-black text-slate-950 truncate">
+                      {session.user?.name || 'Pengurus SAN'}
+                    </p>
+                    <p className="text-[10px] font-mono font-bold text-slate-700 truncate" title={session.user?.email || ''}>
+                      {session.user?.email}
+                    </p>
+                  </div>
+                </div>
                 <Link
                   href="/admin"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="p-3 rounded-xl bg-cyan-200 border-2 border-black font-black text-sm text-slate-950 shadow-[2px_2px_0px_0px_#000] text-center"
+                  className="p-3 rounded-xl bg-cyan-200 border-2 border-black font-black text-sm text-slate-950 shadow-[2px_2px_0px_0px_#000] text-center hover:bg-cyan-300 transition-colors"
                 >
                   Dashboard Admin
                 </Link>
                 <RetroButton
                   variant="danger"
                   size="md"
-                  className="w-full"
+                  className="w-full justify-center"
                   onClick={() => signOut({ callbackUrl: '/' })}
                 >
-                  <LogOut className="w-4 h-4" /> Logout ({session.user?.name || session.user?.email})
+                  <LogOut className="w-4 h-4" /> Keluar (Logout)
                 </RetroButton>
               </div>
             ) : (

@@ -308,7 +308,7 @@ export default function AdminBeritaPage() {
           <h3 className="text-lg sm:text-xl font-black text-slate-950">
             Daftar Berita ({articles.length})
           </h3>
-          <Badge variant="yellow" className="text-xs">MongoDB Collection</Badge>
+          <Badge variant="yellow" className="text-xs whitespace-nowrap shrink-0">MONGODB</Badge>
         </div>
 
         {loading ? (
