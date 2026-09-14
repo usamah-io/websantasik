@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { RetroCard } from '@/components/ui/RetroCard';
 import { RetroButton } from '@/components/ui/RetroButton';
 import { Badge } from '@/components/ui/Badge';
-import { MessageSquare, Send, Mail, MapPin, CheckCircle2, Sparkles, ArrowRight, Phone } from 'lucide-react';
+import { MessageSquare, Send, Mail, MapPin, CheckCircle2, ArrowRight, Phone } from 'lucide-react';
 import { InstagramIcon } from '@/components/ui/SocialIcons';
 
 export function ContactWidget() {
@@ -84,10 +84,6 @@ export function ContactWidget() {
         {/* Left Column: Brand Statement & Contact Details */}
         <div className="lg:col-span-5 space-y-5">
           <div className="bg-gradient-to-br from-amber-300 via-amber-200 to-amber-400 border-4 border-black rounded-3xl p-6 md:p-8 shadow-[6px_6px_0px_0px_#000] space-y-4">
-            <Badge variant="yellow" className="bg-white text-slate-950 font-black">
-              <Sparkles className="w-4 h-4 text-slate-950 inline mr-1" /> FAST RESPONSE
-            </Badge>
-
             <h3 style={{ color: '#000000' }} className="text-2xl md:text-3xl font-black text-black leading-tight">
               Mari Bergerak & Menebar Senyuman Bersama!
             </h3>
