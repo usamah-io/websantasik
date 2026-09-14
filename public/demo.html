@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pratinjau Tampilan Web SAN Tasikmalaya</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    .brutal-card {
+      border: 3px solid #000;
+      box-shadow: 4px 4px 0px 0px #000;
+      transition: all 0.15s ease-in-out;
+    }
+    .brutal-btn {
+      border: 2px solid #000;
+      box-shadow: 2px 2px 0px 0px #000;
+      font-weight: 900;
+      transition: all 0.1s ease;
+      cursor: pointer;
+    }
+    .brutal-btn:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: 3px 3px 0px 0px #000;
+    }
+    .brutal-btn:active {
+      transform: translate(1px, 1px);
+      box-shadow: 1px 1px 0px 0px #000;
+    }
+    .lucide-icon {
+      display: inline-block;
+      vertical-align: middle;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body class="bg-transparent text-[var(--foreground)] antialiased p-2 sm:p-4 font-sans">
+  <div class="max-w-4xl mx-auto bg-amber-50 border-4 border-black rounded-3xl p-4 sm:p-6 shadow-[8px_8px_0px_0px_#000]">
+    
+    <!-- Top Header Bar -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b-3 border-black pb-4 mb-5 bg-amber-300 -mx-4 sm:-mx-6 -mt-4 sm:-mt-6 p-4 sm:p-6 rounded-t-[20px]">
+      <div>
+        <div class="flex items-center gap-2 mb-2 flex-wrap">
+          <span class="px-3 py-1 bg-black text-white font-black text-xs rounded-full uppercase tracking-wider border-2 border-black shadow-[1.5px_1.5px_0px_0px_#000]">
+            SHOWCASE TAMPILAN WEB
+          </span>
+          <!-- High Contrast Badge SAN Chapter Tasikmalaya -->
+          <span class="px-3 py-1 bg-white text-black font-black text-xs rounded-full border-2 border-black shadow-[2px_2px_0px_0px_#000] tracking-wide">
+            SAN Chapter Tasikmalaya
+          </span>
+        </div>
+        <h1 class="text-xl sm:text-2xl font-black text-black tracking-tight">
+          Pratinjau Antarmuka Aplikasi
+        </h1>
+        <p class="text-xs sm:text-sm font-extrabold text-slate-900 mt-0.5">
+          Tinjauan visual layar Dashboard Admin, Halaman Login Google Ramah, dan Manajemen Berita.
+        </p>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border-2 border-black rounded-xl text-xs font-black text-black shadow-[2px_2px_0px_0px_#000]">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+          Versi Terbaru
+        </span>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs (Screen Selector - No Emojis, Clean Lucide Icons) -->
+    <div class="flex items-center gap-2 overflow-x-auto pb-2 mb-5 text-xs font-black">
+      <!-- Tab 1: Dashboard (Default) -->
+      <button onclick="switchScreen('dashboard')" id="tab-dashboard" class="brutal-btn px-4 py-2 rounded-xl bg-amber-400 text-black flex items-center gap-2 shrink-0">
+        <svg class="w-4 h-4 lucide-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+        <span>Dashboard Admin</span>
+      </button>
+
+      <!-- Tab 2: Login -->
+      <button onclick="switchScreen('login')" id="tab-login" class="brutal-btn px-4 py-2 rounded-xl bg-white text-slate-800 flex items-center gap-2 shrink-0">
+        <svg class="w-4 h-4 lucide-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" x2="3" y1="12" y2="12"/></svg>
+        <span>Halaman Login</span>
+      </button>
+
+      <!-- Tab 3: Berita -->
+      <button onclick="switchScreen('berita')" id="tab-berita" class="brutal-btn px-4 py-2 rounded-xl bg-white text-slate-800 flex items-center gap-2 shrink-0">
+        <svg class="w-4 h-4 lucide-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/></svg>
+        <span>Manajemen Berita</span>
+      </button>
+
+      <!-- Tab 4: Cropper Tool (At bottom / secondary) -->
+      <button onclick="switchScreen('cropper')" id="tab-cropper" class="brutal-btn px-4 py-2 rounded-xl bg-white text-slate-800 flex items-center gap-2 shrink-0">
+        <svg class="w-4 h-4 lucide-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M18 22V8a2 2 0 0 0-2-2H2"/></svg>
+        <span>Fitur Crop Gambar</span>
+      </button>
+    </div>
+
+    <!-- ==================== SCREEN 1: DASHBOARD ADMIN ==================== -->
+    <div id="screen-dashboard" class="space-y-4">
+      <!-- Admin Top Banner -->
+      <div class="bg-amber-300 border-3 border-black rounded-2xl p-4 sm:p-5 shadow-[4px_4px_0px_0px_#000] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div>
+          <div class="flex items-center gap-2 mb-1 flex-wrap">
+            <span class="px-2.5 py-0.5 rounded-md bg-white border border-black font-black text-[10px] tracking-wide text-slate-950">
+              PORTAL KEPENGURUSAN
+            </span>
+            <span class="px-2.5 py-0.5 rounded-md bg-amber-400 border-2 border-black font-black text-[10px] text-black shadow-[1px_1px_0px_0px_#000]">
+              MONGODB
+            </span>
+          </div>
+          <h2 class="text-xl sm:text-2xl font-black text-black">
+            Dashboard Panel Pengurus
+          </h2>
+          <p class="text-xs font-bold text-slate-900 mt-0.5">
+            Selamat datang di pusat kendali konten dan direktori SAN Chapter Tasikmalaya.
+          </p>
+        </div>
+
+        <!-- Authenticated Account Box with Truncated Long Email -->
+        <div class="p-2.5 bg-white border-2 border-black rounded-xl shadow-[2px_2px_0px_0px_#000] min-w-0 max-w-full">
+          <span class="text-[9px] font-black uppercase text-slate-500 block mb-0.5">Akun Login Saat Ini:</span>
+          <div class="inline-flex items-center gap-1.5 max-w-full">
+            <span class="font-mono text-xs font-bold text-cyan-950 underline truncate max-w-[190px] sm:max-w-[260px]" title="muhammadusamahabdurrahman@gmail.com">
+              muhammadusamahabdurrahman@gmail.com
+            </span>
+            <span class="text-[9px] px-2 py-0.5 rounded-full bg-purple-200 text-purple-950 border border-black font-black uppercase whitespace-nowrap shrink-0">
+              SUPER ADMIN
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Real-Time Metrics Grid (Clean / No Dummy Numbers) -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+        <div class="p-3.5 bg-cyan-200 border-3 border-black rounded-2xl shadow-[3px_3px_0px_0px_#000] flex items-center justify-between">
+          <div>
+            <span class="text-[10px] font-black uppercase text-slate-700 block">Total Warta Berita</span>
+            <span class="text-2xl font-black text-slate-950">3</span>
+            <span class="text-[9px] font-bold text-slate-600 block mt-0.5">Database Terkoneksi</span>
+          </div>
+          <div class="w-10 h-10 rounded-xl bg-white border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_#000]">
+            <svg class="w-5 h-5 text-black" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/></svg>
+          </div>
+        </div>
+
+        <div class="p-3.5 bg-emerald-200 border-3 border-black rounded-2xl shadow-[3px_3px_0px_0px_#000] flex items-center justify-between">
+          <div>
+            <span class="text-[10px] font-black uppercase text-slate-700 block">Direktori Anggota</span>
+            <span class="text-2xl font-black text-slate-950">0</span>
+            <span class="text-[9px] font-bold text-slate-600 block mt-0.5">Siap Ditambahkan</span>
+          </div>
+          <div class="w-10 h-10 rounded-xl bg-white border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_#000]">
+            <svg class="w-5 h-5 text-black" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+          </div>
+        </div>
+
+        <div class="p-3.5 bg-rose-200 border-3 border-black rounded-2xl shadow-[3px_3px_0px_0px_#000] flex items-center justify-between">
+          <div>
+            <span class="text-[10px] font-black uppercase text-slate-700 block">Foto Galeri Dokumentasi</span>
+            <span class="text-2xl font-black text-slate-950">20</span>
+            <span class="text-[9px] font-bold text-slate-600 block mt-0.5">Hero Slideshow Aktif</span>
+          </div>
+          <div class="w-10 h-10 rounded-xl bg-white border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_#000]">
+            <svg class="w-5 h-5 text-black" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+          </div>
+        </div>
+
+        <div class="p-3.5 bg-amber-200 border-3 border-black rounded-2xl shadow-[3px_3px_0px_0px_#000] flex items-center justify-between">
+          <div>
+            <span class="text-[10px] font-black uppercase text-slate-700 block">Log Audit Aktivitas</span>
+            <span class="text-2xl font-black text-slate-950">Aktif</span>
+            <span class="text-[9px] font-bold text-slate-600 block mt-0.5">Tercatat di Database</span>
+          </div>
+          <div class="w-10 h-10 rounded-xl bg-white border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_#000]">
+            <svg class="w-5 h-5 text-black" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Navigation Grid -->
+      <div class="bg-white border-3 border-black rounded-2xl p-4 shadow-[4px_4px_0px_0px_#000] space-y-3">
+        <h3 class="text-sm font-black uppercase tracking-wider text-slate-950">
+          Akses Menu Pengelolaan
+        </h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2.5">
+          <div class="p-3 rounded-xl bg-amber-100 hover:bg-amber-200 border-2 border-black font-black text-xs text-black flex items-center justify-between cursor-pointer">
+            <span>Manajemen Berita</span>
+            <span>→</span>
+          </div>
+          <div class="p-3 rounded-xl bg-cyan-100 hover:bg-cyan-200 border-2 border-black font-black text-xs text-black flex items-center justify-between cursor-pointer">
+            <span>Direktori Pengurus</span>
+            <span>→</span>
+          </div>
+          <div class="p-3 rounded-xl bg-emerald-100 hover:bg-emerald-200 border-2 border-black font-black text-xs text-black flex items-center justify-between cursor-pointer">
+            <span>Galeri & Slideshow</span>
+            <span>→</span>
+          </div>
+          <div class="p-3 rounded-xl bg-purple-100 hover:bg-purple-200 border-2 border-black font-black text-xs text-black flex items-center justify-between cursor-pointer">
+            <span>Pengaturan Jejaring</span>
+            <span>→</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== SCREEN 2: HALAMAN LOGIN ==================== -->
+    <div id="screen-login" class="hidden space-y-4">
+      <div class="max-w-md mx-auto bg-white border-4 border-black rounded-3xl p-5 sm:p-7 shadow-[6px_6px_0px_0px_#000] space-y-5">
+        <!-- Logo / Brand Header -->
+        <div class="text-center space-y-1.5">
+          <div class="w-12 h-12 rounded-2xl bg-amber-400 border-3 border-black mx-auto flex items-center justify-center font-black text-lg shadow-[3px_3px_0px_0px_#000]">
+            SAN
+          </div>
+          <h2 class="text-xl sm:text-2xl font-black text-black">
+            Portal Masuk Sistem
+          </h2>
+          <p class="text-xs font-extrabold text-slate-700">
+            SAN Chapter Tasikmalaya - Satu Pintu Masuk Pengurus & Anggota
+          </p>
+        </div>
+
+        <!-- Friendly Status Banner (Access Denied Box has been removed!) -->
+        <div class="p-3.5 rounded-2xl bg-emerald-100 border-2 border-black shadow-[2px_2px_0px_0px_#000] space-y-1">
+          <div class="flex items-center gap-1.5 text-emerald-950 font-black text-xs">
+            <svg class="w-4 h-4 text-emerald-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            <span>Akses Masuk Terbuka & Ramah</span>
+          </div>
+          <p class="text-[11px] font-bold text-slate-800 leading-tight">
+            Tidak ada lagi penolakan atau instruksi ganti akun yang membingungkan. Setiap pengguna Google yang berhasil masuk akan langsung diarahkan sesuai hak aksesnya.
+          </p>
+        </div>
+
+        <!-- Google Login Button -->
+        <div class="pt-1">
+          <button class="w-full brutal-btn p-3.5 bg-white hover:bg-slate-50 border-3 border-black rounded-2xl text-xs font-black text-slate-950 flex items-center justify-center gap-3 shadow-[4px_4px_0px_0px_#000]">
+            <!-- Google SVG Icon -->
+            <svg class="w-4 h-4" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+            </svg>
+            <span>Masuk dengan Akun Google</span>
+          </button>
+        </div>
+
+        <!-- Role Redirection Explanation -->
+        <div class="pt-3 border-t-2 border-slate-200 grid grid-cols-2 gap-2 text-[11px] font-bold text-slate-700">
+          <div class="p-2 bg-amber-50 rounded-xl border border-black">
+            <span class="block font-black text-slate-950">Super Admin / Admin</span>
+            Otomatis dialihkan ke Dashboard Admin.
+          </div>
+          <div class="p-2 bg-cyan-50 rounded-xl border border-black">
+            <span class="block font-black text-slate-950">Member Reguler</span>
+            Dialihkan ke Beranda dengan sesi login aktif.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== SCREEN 3: MANAJEMEN BERITA ==================== -->
+    <div id="screen-berita" class="hidden space-y-4">
+      <div class="bg-white border-3 border-black rounded-2xl p-4 sm:p-5 shadow-[4px_4px_0px_0px_#000] space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b-2 border-slate-200 pb-3">
+          <div>
+            <h2 class="text-base sm:text-lg font-black text-black">
+              Kelola Berita & Publikasi Warta
+            </h2>
+            <p class="text-xs font-bold text-slate-600">
+              Daftar kegiatan, dokumentasi bakti sosial, dan kabar resmi organisasi.
+            </p>
+          </div>
+
+          <button class="brutal-btn px-3.5 py-1.5 bg-amber-400 text-black text-xs rounded-xl flex items-center gap-1.5 self-start sm:self-auto">
+            <span>+</span> Tambah Berita Baru
+          </button>
+        </div>
+
+        <!-- Category Filter Pills -->
+        <div class="flex items-center gap-2 text-xs font-black">
+          <span class="px-3 py-1 rounded-lg bg-amber-400 border border-black shadow-[1.5px_1.5px_0px_0px_#000]">Semua (3)</span>
+          <span class="px-3 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300">Kegiatan</span>
+          <span class="px-3 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300">Organisasi</span>
+          <span class="px-3 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300">Sosial</span>
+        </div>
+
+        <!-- Article List Cards -->
+        <div class="space-y-3">
+          <!-- Article 1 -->
+          <div class="p-3 bg-amber-50/70 border-2 border-black rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-3 shadow-[2px_2px_0px_0px_#000]">
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="w-16 h-12 rounded-xl bg-slate-900 border-2 border-black overflow-hidden shrink-0">
+                <img src="https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=150&q=80" class="w-full h-full object-cover" />
+              </div>
+              <div class="min-w-0">
+                <div class="flex items-center gap-2 mb-0.5">
+                  <span class="text-[9px] font-black uppercase px-2 py-0.5 rounded bg-amber-300 border border-black">Kegiatan</span>
+                  <span class="text-[10px] font-bold text-slate-500">12 Sep 2026</span>
+                </div>
+                <h4 class="text-xs sm:text-sm font-black text-slate-950 truncate">Bakti Sosial & Edukasi Pembinaan Anak Tasikmalaya</h4>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-1.5 shrink-0 self-end md:self-auto">
+              <button class="px-2.5 py-1 bg-cyan-200 border border-black rounded-lg text-xs font-black hover:bg-cyan-300">Lihat</button>
+              <button class="px-2.5 py-1 bg-amber-300 border border-black rounded-lg text-xs font-black hover:bg-amber-400">Edit</button>
+              <button class="px-2.5 py-1 bg-rose-200 border border-black rounded-lg text-xs font-black hover:bg-rose-300 text-rose-950">Hapus</button>
+            </div>
+          </div>
+
+          <!-- Article 2 -->
+          <div class="p-3 bg-amber-50/70 border-2 border-black rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-3 shadow-[2px_2px_0px_0px_#000]">
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="w-16 h-12 rounded-xl bg-slate-900 border-2 border-black overflow-hidden shrink-0">
+                <img src="https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=150&q=80" class="w-full h-full object-cover" />
+              </div>
+              <div class="min-w-0">
+                <div class="flex items-center gap-2 mb-0.5">
+                  <span class="text-[9px] font-black uppercase px-2 py-0.5 rounded bg-cyan-300 border border-black">Organisasi</span>
+                  <span class="text-[10px] font-bold text-slate-500">08 Sep 2026</span>
+                </div>
+                <h4 class="text-xs sm:text-sm font-black text-slate-950 truncate">Musyawarah Kerja Pengurus SAN Chapter Tasikmalaya</h4>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-1.5 shrink-0 self-end md:self-auto">
+              <button class="px-2.5 py-1 bg-cyan-200 border border-black rounded-lg text-xs font-black hover:bg-cyan-300">Lihat</button>
+              <button class="px-2.5 py-1 bg-amber-300 border border-black rounded-lg text-xs font-black hover:bg-amber-400">Edit</button>
+              <button class="px-2.5 py-1 bg-rose-200 border border-black rounded-lg text-xs font-black hover:bg-rose-300 text-rose-950">Hapus</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== SCREEN 4: CROPPER TOOL (AT BOTTOM / SECONDARY) ==================== -->
+    <div id="screen-cropper" class="hidden space-y-4">
+      <div class="bg-white border-3 border-black rounded-2xl p-4 sm:p-5 shadow-[4px_4px_0px_0px_#000] space-y-3">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b-2 border-slate-200 pb-3">
+          <div>
+            <h2 class="text-base sm:text-lg font-black text-black flex items-center gap-2">
+              <svg class="w-5 h-5 text-black" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M18 22V8a2 2 0 0 0-2-2H2"/></svg>
+              <span>Fitur Tambahan: Modal Crop & Zoom Foto</span>
+            </h2>
+            <p class="text-xs font-bold text-slate-600">
+              Tampil otomatis ketika admin mengunggah gambar di form Galeri, Berita, atau Pengurus.
+            </p>
+          </div>
+
+          <!-- Format Switcher -->
+          <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-black text-xs font-black">
+            <button onclick="setCropMode('round')" id="c-btn-round" class="px-2.5 py-1 rounded-lg bg-amber-400 border border-black shadow-[1.5px_1.5px_0px_0px_#000]">
+              Avatar Bulat
+            </button>
+            <button onclick="setCropMode('rect')" id="c-btn-rect" class="px-2.5 py-1 rounded-lg text-slate-600 hover:text-black">
+              Sampul 16:9
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-12 gap-4 items-center">
+          <div class="sm:col-span-8 bg-slate-950 rounded-2xl border-2 border-black h-52 relative overflow-hidden flex items-center justify-center">
+            <img id="sim-crop-img" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80" 
+                 class="max-w-none w-56 absolute pointer-events-none transition-transform duration-75" />
+            <div id="sim-mask" class="absolute pointer-events-none border-2 border-amber-400 shadow-[0_0_0_9999px_rgba(0,0,0,0.6)] w-36 h-36 rounded-full"></div>
+          </div>
+
+          <div class="sm:col-span-4 space-y-2 p-3 bg-amber-50 border-2 border-black rounded-xl">
+            <span class="text-[11px] font-black uppercase text-slate-800 block">Kontrol Zoom:</span>
+            <input type="range" min="1" max="2.2" step="0.05" value="1" oninput="handleSimZoom(this.value)" class="w-full accent-amber-500 cursor-pointer" />
+            <div class="flex items-center justify-between text-xs font-black pt-1">
+              <button onclick="rotateSimImg()" class="px-2 py-1 bg-white border border-black rounded-md text-[11px]">Putar 90°</button>
+              <button onclick="alert('Area crop tersimpan siap diunggah ke Cloudinary!')" class="px-3 py-1 bg-emerald-400 border border-black rounded-md text-[11px]">Terapkan</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Footer Status -->
+    <div class="mt-5 pt-3 border-t-2 border-black flex flex-col sm:flex-row items-center justify-between gap-2 text-xs font-black text-slate-900">
+      <span>SAN Chapter Tasikmalaya &bull; Next.js 16 + Neubrutalism UI</span>
+      <span class="font-mono text-[11px] bg-white px-2.5 py-0.5 rounded-lg border border-black shadow-[1px_1px_0px_0px_#000]">
+        Branch: main (Clean)
+      </span>
+    </div>
+
+  </div>
+
+  <!-- Screen Switching Logic -->
+  <script>
+    function switchScreen(screenId) {
+      const screens = ['dashboard', 'login', 'berita', 'cropper'];
+      screens.forEach(s => {
+        const el = document.getElementById('screen-' + s);
+        const btn = document.getElementById('tab-' + s);
+        if (s === screenId) {
+          el.classList.remove('hidden');
+          btn.classList.remove('bg-white', 'text-slate-800');
+          btn.classList.add('bg-amber-400', 'text-black');
+        } else {
+          el.classList.add('hidden');
+          btn.classList.remove('bg-amber-400', 'text-black');
+          btn.classList.add('bg-white', 'text-slate-800');
+        }
+      });
+    }
+
+    // Mini Cropper Simulation
+    let zoomVal = 1;
+    let rotVal = 0;
+    const simImg = document.getElementById('sim-crop-img');
+    const simMask = document.getElementById('sim-mask');
+
+    function updateSimTransform() {
+      simImg.style.transform = `scale(${zoomVal}) rotate(${rotVal}deg)`;
+    }
+
+    function handleSimZoom(v) {
+      zoomVal = parseFloat(v);
+      updateSimTransform();
+    }
+
+    function rotateSimImg() {
+      rotVal = (rotVal + 90) % 360;
+      updateSimTransform();
+    }
+
+    function setCropMode(mode) {
+      const bRound = document.getElementById('c-btn-round');
+      const bRect = document.getElementById('c-btn-rect');
+      if (mode === 'round') {
+        bRound.className = 'px-2.5 py-1 rounded-lg bg-amber-400 border border-black shadow-[1.5px_1.5px_0px_0px_#000]';
+        bRect.className = 'px-2.5 py-1 rounded-lg text-slate-600 hover:text-black';
+        simMask.className = 'absolute pointer-events-none border-2 border-amber-400 shadow-[0_0_0_9999px_rgba(0,0,0,0.6)] w-36 h-36 rounded-full';
+      } else {
+        bRect.className = 'px-2.5 py-1 rounded-lg bg-amber-400 border border-black shadow-[1.5px_1.5px_0px_0px_#000]';
+        bRound.className = 'px-2.5 py-1 rounded-lg text-slate-600 hover:text-black';
+        simMask.className = 'absolute pointer-events-none border-2 border-amber-400 shadow-[0_0_0_9999px_rgba(0,0,0,0.6)] w-48 h-28 rounded-xl';
+      }
+    }
+  </script>
+</body>
+</html>
