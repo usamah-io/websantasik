@@ -2,7 +2,7 @@
 
   <img src="./public/logo.png" alt="San Chapter Tasikmalaya Logo" width="130" height="130" style="border-radius: 20px; border: 4px solid #000; box-shadow: 6px 6px 0px #000;" />
 
-  # 🏛️ SAN CHAPTER TASIKMALAYA
+  # SAN CHAPTER TASIKMALAYA
   ### *Platform Resmi Pemuda, Pelestarian Budaya & Inovasi Sosial Kota Tasikmalaya*
 
   <p align="center">
@@ -22,43 +22,175 @@
   </p>
 
   <p align="center">
-    <a href="#-pratinjau-visual-public-landing-page"><strong>Pratinjau Visual</strong></a> •
-    <a href="#-tentang-proyek"><strong>Tentang</strong></a> •
-    <a href="#-fitur-unggulan"><strong>Fitur</strong></a> •
-    <a href="#-arsitektur--tech-stack"><strong>Tech Stack</strong></a> •
-    <a href="#-panduan-deployment-ke-vercel-upload-envlocal"><strong>Panduan Vercel (.env.local)</strong></a> •
-    <a href="#-menjalankan-secara-lokal-local-development"><strong>Local Setup</strong></a>
+    <a href="#pratinjau-antarmuka-aplikasi"><strong>Pratinjau Antarmuka</strong></a> •
+    <a href="#tentang-proyek"><strong>Tentang</strong></a> •
+    <a href="#fitur-unggulan"><strong>Fitur</strong></a> •
+    <a href="#arsitektur--tech-stack"><strong>Tech Stack</strong></a> •
+    <a href="#panduan-deployment-ke-vercel-upload-envlocal"><strong>Panduan Vercel (.env.local)</strong></a> •
+    <a href="#menjalankan-secara-lokal-local-development"><strong>Local Setup</strong></a>
   </p>
 
 </div>
 
 ---
 
-## 📸 Pratinjau Visual (Public Landing Page)
+## Pratinjau Antarmuka Aplikasi
 
-> [!IMPORTANT]
-> **Kebijakan Kerahasiaan & Privasi Akses Internal**:
-> Pratinjau visual di bawah ini **secara eksklusif hanya menampilkan Halaman Beranda Publik (Public Landing Page)**. Seluruh panel administrasi internal (*Admin Dashboard*, manajemen basis data anggota, warta, serta audit log IP) dilindungi oleh otentikasi ketat berjenjang (*Google OAuth 2.0 & Role-Based Access Control*) dan sengaja tidak dipublikasikan pada repositori ini demi menjaga keamanan sistem.
+Bagian ini menyajikan gambaran visual layar antarmuka utama pada website **SAN Chapter Tasikmalaya**, meliputi panel **Dashboard Admin**, **Halaman Login**, dan **Manajemen Berita**.
+
+> [!NOTE]
+> Simulator demo interaktif mandiri tersedia di [`interactive_demo.html`](./interactive_demo.html) (atau buka `/demo.html` saat menjalankan server lokal). Dokumentasi teknis lengkap tersedia di [`DEMO_SHOWCASE.md`](./DEMO_SHOWCASE.md).
+
+---
+
+### 1. Tampilan Utama: Dashboard Admin (`/admin`)
+
+Tampilan awal panel pengurus dengan banner neubrutalisme kuning tebal, informasi akun terautentikasi responsif, badge `MONGODB` satu baris, dan kartu metrik riil dari database.
+
+```text
++---------------------------------------------------------------------------------------+
+| [PORTAL KEPENGURUSAN]  [MONGODB]                                                      |
+| Dashboard Panel Pengurus                                                              |
+| Pusat kendali warta, direktori pengurus, dan galeri kegiatan SAN Tasikmalaya          |
+|                                                                                       |
+|   [AKUN LOGIN SAAT INI:]                                                              |
+|   muhammadusamahabdurrahman@gmail.com  [ SUPER ADMIN ]                                |
++---------------------------------------------------------------------------------------+
+
++--------------------+  +--------------------+  +--------------------+  +---------------+
+| WARTA BERITA       |  | DIREKTORI ANGGOTA  |  | GALERI SLIDESHOW   |  | AUDIT LOG     |
+| 3                  |  | 0                  |  | 20                 |  | Aktif         |
+| Database Terkoneksi|  | Siap Ditambahkan   |  | Foto Dokumentasi   |  | Terverifikasi |
++--------------------+  +--------------------+  +--------------------+  +---------------+
+
+AKSES CEPAT MENU PENGELOLAAN:
+[ Manajemen Berita → ]  [ Direktori Pengurus → ]  [ Galeri Slideshow → ]  [ Pengaturan → ]
+```
+
+- **Email Panjang Terproteksi**: Menggunakan `truncate max-w-[190px] sm:max-w-md` dan tooltip agar teks email panjang tidak keluar dari batas kartu pada perangkat seluler.
+- **Badge Akses 1 Baris**: Badge `SUPER ADMIN` dikunci dengan `whitespace-nowrap shrink-0` sehingga tidak akan terbelah menjadi 2 baris.
+- **Badge Database Padat**: Diringkas seragam menjadi `[ MONGODB ]` menggantikan teks lama yang memakan 3 baris.
+- **Metrik Bebas Data Palsu**: Grafik dan kartu statistik hanya menyajikan data riil tanpa angka palsu, dilengkapi *timeout guard* 4 detik untuk mencegah *infinite loading*.
+
+---
+
+### 2. Tampilan Halaman Login (`/login` & `/admin/login`)
+
+Pintu masuk tunggal yang ramah pengguna. Tidak ada lagi penolakan akses yang kaku atau instruksi ganti akun Google yang membingungkan.
+
+```text
++-------------------------------------------------------------------+
+|                              [ SAN ]                              |
+|                                                                   |
+|                    Portal Masuk Sistem                            |
+|             SAN Chapter Tasikmalaya - Pengurus & Anggota          |
+|                                                                   |
+|  +-------------------------------------------------------------+  |
+|  | [STATUS] Akses Masuk Terbuka & Ramah                        |  |
+|  | Setiap akun Google yang masuk diakui secara sah. Hak akses  |  |
+|  | dan pengalihan halaman disesuaikan secara otomatis.         |  |
+|  +-------------------------------------------------------------+  |
+|                                                                   |
+|  +-------------------------------------------------------------+  |
+|  |   [G] Masuk dengan Akun Google                              |  |
+|  +-------------------------------------------------------------+  |
+|                                                                   |
+|  ALUR PENGALIHAN BERBASIS PERAN (RBAC):                           |
+|  • Super Admin / Admin  : Otomatis masuk ke /admin (Dashboard)   |
+|  • Member Reguler / Tamu: Dialihkan ke / (Beranda Utama)          |
++-------------------------------------------------------------------+
+```
+
+#### Menu Dropdown Profil di Header (Setelah Login):
+```text
++-----------------------------------------------------------------------------+
+| [SAN] Tasikmalaya      Beranda   Berita   Anggota    [ (Avatar) M. Usamah ▼ ]|
++-----------------------------------------------------------------------+-----+
+                                                                        |
+                                         +------------------------------v---+
+                                         | [INFO] M. Usamah Abdurrahman     |
+                                         |        muhammadusamah...@gmail...|
+                                         |        [ SUPER ADMIN ]           |
+                                         +----------------------------------+
+                                         | Dashboard Admin               →  |
+                                         | Beranda Utama                    |
+                                         | Berita & Kegiatan                |
+                                         | Jajaran Pengurus                 |
+                                         +----------------------------------+
+                                         | [ Keluar (Logout) ]              |
+                                         +----------------------------------+
+```
+
+---
+
+### 3. Tampilan Manajemen Berita (`/admin/berita`)
+
+Pusat publikasi warta kegiatan, aksi sosial, dan kabar resmi organisasi.
+
+```text
++---------------------------------------------------------------------------------------+
+| Kelola Berita & Publikasi Warta                               [ + Tambah Berita Baru ]|
+| Arsip kegiatan, bakti sosial, dan siaran pers organisasi SAN Tasikmalaya              |
+|                                                                                       |
+| Kategori: [ Semua (3) ]  [ Kegiatan ]  [ Organisasi ]  [ Sosial ]                     |
++---------------------------------------------------------------------------------------+
+
+DAFTAR ARTIKEL WARTA:
++---------------------------------------------------------------------------------------+
+| [FOTO]  [KEGIATAN] 12 Sep 2026                                                        |
+|         Bakti Sosial & Edukasi Pembinaan Anak Tasikmalaya                             |
+|                                                     [ Lihat ]  [ Edit ]  [ Hapus ]    |
++---------------------------------------------------------------------------------------+
+| [FOTO]  [ORGANISASI] 08 Sep 2026                                                      |
+|         Musyawarah Kerja Pengurus SAN Chapter Tasikmalaya                             |
+|                                                     [ Lihat ]  [ Edit ]  [ Hapus ]    |
++---------------------------------------------------------------------------------------+
+| [FOTO]  [SOSIAL] 01 Sep 2026                                                          |
+|         Penyaluran Bantuan Sembako Bersama Komunitas Relawan                          |
+|                                                     [ Lihat ]  [ Edit ]  [ Hapus ]    |
++---------------------------------------------------------------------------------------+
+```
+
+---
+
+### 4. Fitur Pelengkap: Modal Crop & Zoom Foto (Gaya Discord)
+
+Utilitas interaktif yang otomatis muncul saat admin mengunggah berkas foto di form Pengurus, Galeri, atau Berita:
+
+```text
++-------------------------------------------------------------------------+
+| [CROP] Sesuaikan & Edit Foto                                      [ X ] |
++-------------------------------------------------------------------------+
+|                                                                         |
+|   +-----------------------------------------------------------------+   |
+|   |                        AREA KANVAS GAMBAR                       |   |
+|   |                      (Bisa digeser / drag)                      |   |
+|   |                                                                 |   |
+|   |                    Bingkai Crop:                                |   |
+|   |                    - Lingkaran 1:1 (Avatar Pengurus Discord)    |   |
+|   |                    - Persegi 16:9 (Sampul Berita & Galeri)      |   |
+|   +-----------------------------------------------------------------+   |
+|                                                                         |
+|   Zoom: [----O-------------------------] [ 130% ]                       |
+|   [ Putar 90° ]  [ Reset Posisi ]                                       |
+|                                                                         |
++-------------------------------------------------------------------------+
+|                                      [ Batal ]  [ Terapkan (Apply) ]    |
++-------------------------------------------------------------------------+
+```
+
+---
+
+### 5. Pratinjau Halaman Beranda Publik
 
 <div align="center">
   <img src="./public/images/preview-landing.png" alt="San Chapter Tasikmalaya Public Landing Page Mockup" width="100%" style="border-radius: 16px; border: 4px solid #000000; box-shadow: 8px 8px 0px #000000;" />
   <p><sub><em>Tampilan Beranda Publik: Hero Section Dinamis, Slideshow Galeri Resolusi Tinggi, dan 3 Pilar Gerakan Pemuda</em></sub></p>
 </div>
 
-### ✨ Sorotan Pengalaman Halaman Publik:
-* 🎨 **Desain Neo-Brutalism Modern**: Karakter visual berani dengan garis luar tegas (*4px black border*), bayangan tajam (*hard drop shadows*), dan tipografi berkontras tinggi yang nyaman dibaca di segala kondisi pencahayaan.
-* 🎞️ **Slideshow Galeri Interaktif**: Showcase dokumentasi kegiatan sosial dan kebudayaan pemuda dengan 20+ foto resolusi tinggi serta navigasi halus.
-* ⚡ **3 Pilar Gerakan Pemuda**:
-  1. **Aksi Social Care**: Bakti sosial nyata, tanggap bencana, dan pendampingan pendidikan anak pelosok Tasikmalaya.
-  2. **Seni & Kebudayaan**: Pelestarian kekayaan tradisi, kreasi seni daerah, dan kearifan lokal Tasikmalaya.
-  3. **Inovasi Digital**: Pengembangan kecakapan digital pemuda dan pemberdayaan kreatif UMKM daerah.
-* 📰 **Umpan Berita Terkini Dinamis (Latest 3 Articles)**: Menampilkan 3 artikel terhangat secara *real-time* langsung dari koleksi MongoDB Atlas lengkap dengan cover, kategori, tanggal publikasi, dan total pembaca.
-* 🌊 **Transisi Halaman Sinematik**: Efek tirai gelombang *bottom-to-top* berkecepatan 0.75 detik berbasis kurva kubik `easeInOutCubic` (`[0.65, 0, 0.35, 1]`) yang anggun dan tanpa jeda kaku.
-* 📱 **Aksi Sosial Terintegrasi**: Tombol interaktif langsung menuju kanal resmi Instagram (`@san.tasikmalaya.2020`) dan YouTube (`@sanchaptertasikmalaya3661`).
-
 ---
 
-## 🏛️ Tentang Proyek
+## Tentang Proyek
 
 **San Chapter Tasikmalaya** adalah platform digital komprehensif yang dirancang untuk memperkuat transparansi publik, publikasi warta kegiatan, dan keanggotaan pemuda di Kota Tasikmalaya, Jawa Barat. 
 
@@ -66,7 +198,7 @@ Dibangun menggunakan arsitektur mutakhir **Next.js 16 (App Router + Turbopack)**
 
 ---
 
-## 🌟 Fitur Unggulan
+## Fitur Unggulan
 
 ### 1. Pengalaman Publik (Public-Facing Experience)
 - **Beranda Interaktif**: Transisi halus antar section, slideshow foto dokumentasi, dan highlight program kerja.
@@ -85,7 +217,7 @@ Dibangun menggunakan arsitektur mutakhir **Next.js 16 (App Router + Turbopack)**
 
 ---
 
-## 💻 Arsitektur & Tech Stack
+## Arsitektur & Tech Stack
 
 | Lapisan | Teknologi | Versi | Peran & Deskripsi |
 | :--- | :--- | :--- | :--- |
@@ -96,12 +228,13 @@ Dibangun menggunakan arsitektur mutakhir **Next.js 16 (App Router + Turbopack)**
 | **Basis Data** | [MongoDB Atlas](https://www.mongodb.com/atlas) | `Mongoose 9` | Skema basis data terstruktur untuk News, Members, Users, Settings, & Audit |
 | **Otentikasi** | [NextAuth.js](https://next-auth.js.org/) | `v4.24` | Session management berbasis JWT, Google Provider, RBAC Middleware |
 | **Media Cloud** | [Cloudinary](https://cloudinary.com/) | `v2.11` | Optimasi dan pengunggahan aset gambar digital |
-| **Ikonografi** | [Lucide React](https://lucide.dev/) | `v1.43` | Ikon vektor elegan dan konsisten |
+| **Image Cropper** | [react-easy-crop](https://github.com/ValentinH/react-easy-crop) | `5.5` | Cropper interaktif modal dengan zoom & rotasi gaya Discord |
+| **Ikonografi** | [Lucide React](https://lucide.dev/) | `v1.43` | Ikon vektor konsisten dan elegan |
 | **Visualisasi** | [Recharts](https://recharts.org/) | `v3.10` | Grafik statistik metrik pengunjung di dashboard internal |
 
 ---
 
-## 🚀 Panduan Deployment ke Vercel (Upload `.env.local`)
+## Panduan Deployment ke Vercel (Upload `.env.local`)
 
 Repositori ini telah disiapkan agar dapat di-deploy ke **[Vercel](https://vercel.com)** secara langsung. Seluruh variabel lingkungan telah dikonsolidasikan ke dalam **satu berkas utama**, yaitu `.env.local`.
 
@@ -138,7 +271,7 @@ Repositori ini telah disiapkan agar dapat di-deploy ke **[Vercel](https://vercel
 
 ---
 
-## 🛠️ Menjalankan Secara Lokal (Local Development)
+## Menjalankan Secara Lokal (Local Development)
 
 Bagi pengembang yang ingin menjalankan proyek ini di lingkungan lokal:
 
@@ -171,7 +304,7 @@ npm run build
 
 ---
 
-## 📂 Struktur Proyek
+## Struktur Proyek
 
 ```text
 websantasik/
@@ -179,6 +312,7 @@ websantasik/
 │   ├── images/
 │   │   ├── foto1.jpg s/d foto20.jpg   # 20 Foto dokumentasi resmi resolusi tinggi
 │   │   └── preview-landing.png        # Screenshot pratinjau halaman beranda publik
+│   ├── demo.html                      # Simulator demo interaktif (bisa dibuka di browser)
 │   └── logo.png                       # Logo resmi San Chapter Tasikmalaya
 ├── src/
 │   ├── app/
@@ -191,11 +325,14 @@ websantasik/
 │   ├── components/
 │   │   ├── admin/                     # Komponen Dashboard & Chart Internal
 │   │   ├── layout/                    # Navbar, Footer, PageTransition Wave
-│   │   └── ui/                        # RetroCard, RetroButton, Badge Neo-Brutalism
+│   │   └── ui/                        # RetroCard, RetroButton, Badge, ImageCropperModal
 │   └── lib/
 │       ├── auth.ts                    # Konfigurasi NextAuth.js & RBAC Guard
+│       ├── cropImage.ts               # Utilitas crop HTML5 Canvas
 │       ├── mongodb.ts                 # Koneksi & Caching MongoDB Mongoose
 │       └── models/                    # Schema Mongoose (News, Member, User, Settings)
+├── DEMO_SHOWCASE.md                   # Dokumentasi tampilan demo antarmuka
+├── interactive_demo.html              # Standalone interactive demo HTML
 ├── .env.local                         # File konfigurasi Environment Variables utama
 ├── next.config.ts                     # Konfigurasi Next.js & Remote Image Patterns
 └── package.json                       # Dependensi proyek
@@ -203,13 +340,13 @@ websantasik/
 
 ---
 
-## 🤝 Kanal Resmi Organisasi
+## Kanal Resmi Organisasi
 
 Mari terhubung dan berkolaborasi bersama pemuda Tasikmalaya:
 
-- 📷 **Instagram**: [@san.tasikmalaya.2020](https://www.instagram.com/san.tasikmalaya.2020/)
-- 📺 **YouTube**: [@sanchaptertasikmalaya3661](https://www.youtube.com/@sanchaptertasikmalaya3661)
-- ✉️ **Email Resmi**: [san.tasikmalaya.2020@gmail.com](mailto:san.tasikmalaya.2020@gmail.com)
+- **Instagram**: [@san.tasikmalaya.2020](https://www.instagram.com/san.tasikmalaya.2020/)
+- **YouTube**: [@sanchaptertasikmalaya3661](https://www.youtube.com/@sanchaptertasikmalaya3661)
+- **Email Resmi**: [san.tasikmalaya.2020@gmail.com](mailto:san.tasikmalaya.2020@gmail.com)
 
 ---
 
