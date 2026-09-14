@@ -1,195 +1,132 @@
-# 🌟 Live Showcase & Demo Fitur Website SAN Chapter Tasikmalaya
+# Pratinjau Tampilan Antarmuka (UI Demo) - SAN Chapter Tasikmalaya
 
-Dokumen ini merangkum seluruh hasil pengembangan, perbaikan UI/UX, perombakan sistem otentikasi (RBAC), pembersihan data, serta penambahan fitur interaktif di sepanjang sesi percakapan secara visual seperti sebuah **demo interaktif**.
+Dokumen ini menyajikan gambaran visual antarmuka aplikasi website **SAN Chapter Tasikmalaya** dengan fokus utama pada layar **Dashboard Admin**, **Halaman Login**, dan **Manajemen Berita**, dengan gaya desain Neubrutalisme yang rapi, kontras tinggi, dan tanpa elemen emoji generik.
 
 ---
 
-## 📑 Daftar Fitur yang Telah Dikerjakan
+## 1. Tampilan Utama: Dashboard Admin (`/admin`)
 
-```mermaid
-graph TD
-    A["Sesi Percakapan Web SAN Tasikmalaya"] --> B["1. Image Cropper & Zoom (Discord Style)"]
-    A --> C["2. RBAC Login Ramah & Profile Dropdown"]
-    A --> D["3. Dashboard UI/UX & MONGODB Compact"]
-    A --> E["4. Pembersihan AI Badge FAST RESPONSE"]
+Tampilan awal dashboard pengurus menampilkan header bernuansa kuning neubrutalisme dengan kartu akun login responsif, badge database `MONGODB` yang padat (1 baris), dan metrik aktivitas riil dari database.
 
-    B --> B1["react-easy-crop & HTML5 Canvas"]
-    B --> B2["Avatar Bulat 1:1 & Cover 16:9"]
-    B --> B3["Upload Otomatis ke Cloudinary"]
+```
++---------------------------------------------------------------------------------------+
+| [PORTAL KEPENGURUSAN]  [MONGODB]                                                      |
+| Dashboard Panel Pengurus                                                              |
+| Pusat kendali warta, direktori pengurus, dan galeri kegiatan SAN Tasikmalaya          |
+|                                                                                       |
+|   [AKUN LOGIN SAAT INI:]                                                              |
+|   muhammadusamahabdurrahman@gmail.com  [ SUPER ADMIN ]                                |
++---------------------------------------------------------------------------------------+
 
-    C --> C1["Hapus Penolakan Akses Google"]
-    C --> C2["Auto-redirect Role Super Admin vs Member"]
-    C --> C3["Dropdown Profil Neubrutalisme"]
++--------------------+  +--------------------+  +--------------------+  +---------------+
+| WARTA BERITA       |  | DIREKTORI ANGGOTA  |  | GALERI SLIDESHOW   |  | AUDIT LOG     |
+| 3                  |  | 0                  |  | 20                 |  | Aktif         |
+| Database Terkoneksi|  | Siap Ditambahkan   |  | Foto Dokumentasi   |  | Terverifikasi |
++--------------------+  +--------------------+  +--------------------+  +---------------+
 
-    D --> D1["Text Truncate Email Panjang"]
-    D --> D2["Badge MONGODB 1 Baris"]
-    D --> D3["Pembersihan Data Palsu / Dummy"]
+AKSES CEPAT MENU PENGELOLAAN:
+[ Manajemen Berita → ]  [ Direktori Pengurus → ]  [ Galeri Slideshow → ]  [ Pengaturan → ]
+```
 
-    E --> E1["Hapus Sparkles & FAST RESPONSE"]
-    E --> E2["Layout Kartu Kontak Rapi & Natural"]
+### Karakteristik Tampilan:
+- **Teks Email Panjang**: Menggunakan kelas responsif `truncate max-w-[190px] sm:max-w-md` beserta atribut `title` agar teks email tidak keluar dari layar ponsel.
+- **Badge Akses**: Bertuliskan `SUPER ADMIN` dengan properti `whitespace-nowrap shrink-0` sehingga selalu terkunci rapi dalam 1 baris.
+- **Badge Database**: Diringkas seragam menjadi `[ MONGODB ]` menggantikan teks lama yang memakan 3 baris.
+
+---
+
+## 2. Tampilan Halaman Login (`/login` & `/admin/login`)
+
+Pintu masuk tunggal yang ramah pengguna. Tidak ada lagi kotak peringatan penolakan akses atau instruksi ganti akun Google yang membingungkan.
+
+```
++-------------------------------------------------------------------+
+|                              [ SAN ]                              |
+|                                                                   |
+|                    Portal Masuk Sistem                            |
+|             SAN Chapter Tasikmalaya - Pengurus & Anggota          |
+|                                                                   |
+|  +-------------------------------------------------------------+  |
+|  | [STATUS] Akses Masuk Terbuka & Ramah                        |  |
+|  | Setiap akun Google yang masuk dianggap sah. Hak akses       |  |
+|  | dan pengalihan halaman disesuaikan secara otomatis.         |  |
+|  +-------------------------------------------------------------+  |
+|                                                                   |
+|  +-------------------------------------------------------------+  |
+|  |   [G] Masuk dengan Akun Google                              |  |
+|  +-------------------------------------------------------------+  |
+|                                                                   |
+|  ALUR PENGALIHAN BERBASIS PERAN (RBAC):                           |
+|  • Super Admin / Admin  : Langsung masuk ke /admin (Dashboard)   |
+|  • Member Reguler / Tamu: Dialihkan ke / (Beranda Utama)          |
++-------------------------------------------------------------------+
+```
+
+### Menu Dropdown Profil di Header (Setelah Login):
+Ketika pengguna sudah login, avatar di sudut kanan atas navbar dapat diklik untuk menampilkan menu popover:
+- **Header Profil**: Nama pengguna, email, dan label peran (`SUPER ADMIN` atau `MEMBER`).
+- **Tautan Dashboard Admin**: Hanya muncul untuk pengguna dengan peran admin/super admin.
+- **Tautan Navigasi Cepat**: Beranda Utama, Berita & Kegiatan, dan Jajaran Pengurus.
+- **Tombol Logout**: Tombol keluar berwarna merah muda lembut yang aman membersihkan sesi.
+
+---
+
+## 3. Tampilan Manajemen Berita (`/admin/berita`)
+
+Pusat publikasi warta kegiatan, aksi sosial, dan kabar resmi organisasi.
+
+```
++---------------------------------------------------------------------------------------+
+| Kelola Berita & Publikasi Warta                               [ + Tambah Berita Baru ]|
+| Arsip kegiatan, bakti sosial, dan siaran pers organisasi SAN Tasikmalaya              |
+|                                                                                       |
+| Kategori: [ Semua (3) ]  [ Kegiatan ]  [ Organisasi ]  [ Sosial ]                     |
++---------------------------------------------------------------------------------------+
+
+DAFTAR ARTIKEL WARTA:
++---------------------------------------------------------------------------------------+
+| [FOTO]  [KEGIATAN] 12 Sep 2026                                                        |
+|         Bakti Sosial & Edukasi Pembinaan Anak Tasikmalaya                             |
+|                                                     [ Lihat ]  [ Edit ]  [ Hapus ]    |
++---------------------------------------------------------------------------------------+
+| [FOTO]  [ORGANISASI] 08 Sep 2026                                                      |
+|         Musyawarah Kerja Pengurus SAN Chapter Tasikmalaya                             |
+|                                                     [ Lihat ]  [ Edit ]  [ Hapus ]    |
++---------------------------------------------------------------------------------------+
+| [FOTO]  [SOSIAL] 01 Sep 2026                                                          |
+|         Penyaluran Bantuan Sembako Bersama Komunitas Relawan                          |
+|                                                     [ Lihat ]  [ Edit ]  [ Hapus ]    |
++---------------------------------------------------------------------------------------+
 ```
 
 ---
 
-## 🎨 DEMO 1: Fitur Interaktif Image Cropper & Zoom (Gaya Discord)
+## 4. Fitur Tambahan (Di Bawah): Modal Crop & Zoom Foto
 
-Fitur ini mengintegrasikan pustaka `react-easy-crop` dan utilitas pemrosesan kanvas [`cropImage.ts`](file:///c:/websantasik/src/lib/cropImage.ts) untuk memberikan pengalaman crop foto setingkat aplikasi modern seperti Discord.
+Fitur utilitas yang muncul otomatis dalam bentuk modal dialog pop-up ketika admin memilih berkas gambar pada formulir unggah:
 
-### 🖼️ Visualisasi Modal Pop-up:
 ```
 +-------------------------------------------------------------------------+
-| [✂️] Sesuaikan & Edit Foto (Discord Style)                         [ ✕ ] |
+| [CROP] Sesuaikan & Edit Foto                                      [ X ] |
 +-------------------------------------------------------------------------+
 |                                                                         |
 |   +-----------------------------------------------------------------+   |
-|   |                       AREA VIEWPORT KANVAS                      |   |
+|   |                        AREA KANVAS GAMBAR                       |   |
+|   |                      (Bisa digeser / drag)                      |   |
 |   |                                                                 |   |
-|   |                     .----------------------.                    |   |
-|   |                   /     AREA CROP           \                   |   |
-|   |                  |     (Mask Lingkaran       |                  |   |
-|   |                  |     atau Persegi 16:9)    |                  |   |
-|   |                   \                         /                   |   |
-|   |                     '----------------------'                    |   |
-|   |                                                                 |   |
-|   | [Drag to Pan / Geser Gambar Bebas dengan Mouse/Touch]           |   |
+|   |                    Bingkai Crop:                                |   |
+|   |                    - Lingkaran 1:1 (Avatar Pengurus Discord)    |   |
+|   |                    - Persegi 16:9 (Sampul Berita & Galeri)      |   |
 |   +-----------------------------------------------------------------+   |
 |                                                                         |
-|   Rasio Aspek: [ 16:9 Sampul ] [ 4:3 Klasik ] [ 1:1 Persegi ] [ Bebas ] |
-|                                                                         |
-|   +-----------------------------------------------------------------+   |
-|   | 🔍 Zoom: [----●------------------------------] [ 140% ]         |   |
-|   |                                                                 |   |
-|   | [ 🔄 Putar 90° ]  [ ↺ Reset Posisi ]                            |   |
-|   +-----------------------------------------------------------------+   |
+|   Zoom: [----O-------------------------] [ 130% ]                       |
+|   [ Putar 90° ]  [ Reset Posisi ]                                       |
 |                                                                         |
 +-------------------------------------------------------------------------+
-|                                      [ Batal ]  [ ✓ Terapkan (Apply) ]  |
+|                                      [ Batal ]  [ Terapkan (Apply) ]    |
 +-------------------------------------------------------------------------+
 ```
 
-### 🎯 Karakteristik Tiap Formulir Admin:
-| Formulir Admin | Bentuk Masking | Rasio Default | Lokasi Penyimpanan |
-| :--- | :--- | :--- | :--- |
-| **Manajemen Pengurus** (`/admin/anggota`) | **Lingkaran (Round)** | `1:1` | Cloudinary &rarr; MongoDB Member |
-| **Dokumentasi Galeri** (`/admin/gallery`) | **Persegi (Rect)** | `16:9` (Fleksibel) | Cloudinary &rarr; MongoDB Gallery |
-| **Berita & Warta** (`/admin/berita`) | **Persegi (Rect)** | `16:9` (Fleksibel) | Cloudinary &rarr; MongoDB News |
-
-> [!TIP]
-> **Keunggulan Teknis:**
-> - Menghasilkan objek `File`/`Blob` baru (`image/jpeg` kualitas 92%) langsung di sisi *client*.
-> - Menghilangkan risiko gambar gepeng, terpotong aneh, atau distorsi rasio saat dirender di antarmuka publik.
-
----
-
-## 👤 DEMO 2: Navbar & Dropdown Profil Interaktif (Sistem RBAC)
-
-Sistem login dirombak agar tidak ada lagi penolakan akses yang kaku. Siapa pun yang login dengan Google diterima secara sah, dan dialihkan sesuai hak aksesnya:
-
-```mermaid
-sequenceDiagram
-    autonumber
-    actor User as Pengguna / Pengurus
-    participant Google as Google Auth
-    participant Proxy as Proxy Middleware
-    participant Page as Destinasi Halaman
-
-    User->>Google: Klik Masuk dengan Google
-    Google-->>Proxy: Login Berhasil & Token JWT
-    alt Role adalah Super Admin / Admin
-        Proxy->>Page: Redirect otomatis ke /admin (Dashboard Admin)
-    else Role adalah Member Biasa (User)
-        Proxy->>Page: Redirect mulus ke / (Beranda Utama)
-    end
-    Note over User,Page: Sesi login selalu tetap aktif tanpa ada pesan ditolak!
-```
-
-### 💻 Tampilan Dropdown Profil Navbar (Desktop):
-```
-+-----------------------------------------------------------------------------+
-| [SAN] Tasikmalaya      Beranda   Berita   Anggota    [ (Avatar) M. Usamah ▼ ]|
-+-----------------------------------------------------------------------+-----+
-                                                                        |
-                                         +------------------------------v---+
-                                         | [👤] M. Usamah Abdurrahman       |
-                                         |      muhammadusamah...@gmail.com |
-                                         |      [ BADGE: SUPER ADMIN ]      |
-                                         +----------------------------------+
-                                         | ⚡ Dashboard Admin            → |
-                                         | 🏠 Beranda Utama                 |
-                                         | 📰 Berita & Kegiatan             |
-                                         | 👥 Jajaran Pengurus              |
-                                         +----------------------------------+
-                                         | [ 🚪 Keluar (Logout) ]           |
-                                         +----------------------------------+
-```
-
----
-
-## 📊 DEMO 3: Dashboard Admin Responsif & Sinkronisasi Database Real-Time
-
-### 1. Perbaikan Teks Akun & Email Panjang
-- **Sebelumnya**: Email panjang seperti `muhammadusamahabdurrahman@gmail.com` meluap keluar batas kartu atau patah berantakan pada layar HP. Badge `SUPER ADMIN` terpotong menjadi 2 baris.
-- **Sesudah**:
-  ```tsx
-  // Hasil Implementasi Responsif Neubrutalisme
-  <span className="font-mono text-cyan-950 underline truncate max-w-[170px] sm:max-w-[340px]" title={email}>
-    muhammadusamahabdurrahman@gmail.com
-  </span>
-  <span className="whitespace-nowrap shrink-0 text-[10px] py-0.5 px-2 font-black">
-    SUPER ADMIN
-  </span>
-  ```
-
-### 2. Standardisasi Badge Database
-- **Sebelumnya**: Badge bertuliskan `MONGODB USER COLLECTION` memakan 3 baris di perangkat seluler.
-- **Sesudah**: Diringkas seragam menjadi satu baris padat berkelas neubrutalisme:
-  ```html
-  [ MONGODB ]
-  ```
-
-### 3. Pembersihan Data Palsu / Dummy
-- **Grafik Mingguan & Diagram Donat**: Seluruh angka fiktif (`180, 240, 310 views`, dsb.) telah dibersihkan. Grafik kini hanya menyajikan interaksi aktual atau *clean empty state* ("Belum Ada Data Konten").
-- **Proteksi Infinite Loading**: Ditambahkan pelindung batas waktu (*timeout guard*) 4 detik pada Server Action database dan 8 detik pada sisi klien sehingga dashboard tidak akan pernah macet (*freeze*).
-
----
-
-## ✉️ DEMO 4: Section Kontak Bersih (Tanpa Badge AI)
-
-Pada kartu informasi section **Hubungi & Kolaborasi**, badge generik `FAST RESPONSE` dengan ikon bintang (`Sparkles`) telah dihapus secara bersih:
-
-```
-[SEBELUM]                                [SESUDAH]
-+-----------------------------------+    +-----------------------------------+
-| [✨ FAST RESPONSE]                |    |                                   |
-|                                   |    | Mari Bergerak & Menebar Senyuman  |
-| Mari Bergerak & Menebar Senyuman  |    | Bersama!                          |
-| Bersama!                          |    |                                   |
-|                                   |    | Kami selalu terbuka untuk...      |
-| Kami selalu terbuka untuk...      |    |                                   |
-| [ WhatsApp ]  [ Email ]           |    | [ WhatsApp ]  [ Email ]           |
-+-----------------------------------+    +-----------------------------------+
-```
-Tampilan kini langsung menyatu mulus dengan judul kartu dengan spasi vertikal proporsional tanpa sisa elemen asing buatan AI.
-
----
-
-## 🚀 Log Komitmen & Status Deployment
-
-| Commit Hash | Deskripsi Pekerjaan | Status Git |
-| :--- | :--- | :--- |
-| `1dfd99b` | Rangkuman perbaikan UI/UX dashboard admin & data riil | `pushed to origin/main` |
-| `27b1532` | RBAC redirection ramah pengguna & dropdown profil navbar | `pushed to origin/main` |
-| `6f15b79` | Penghapusan badge AI FAST RESPONSE di kotak kontak | `pushed to origin/main` |
-| `f9f24d2` | Fitur interaktif Image Cropper & Zoom gaya Discord (Galeri, Pengurus, Berita) | `pushed to origin/main` |
-
----
-
-## 🎮 Cara Menjalankan & Mencoba Fitur:
-1. Pastikan server lokal berjalan:
-   ```powershell
-   npm run dev
-   ```
-2. Buka browser di [http://localhost:3000](http://localhost:3000):
-   - **Coba Login**: Masuk via tombol profil kanan atas untuk menguji *Profile Dropdown* & *RBAC Redirection*.
-   - **Coba Cropper Pengurus**: Buka [http://localhost:3000/admin/anggota](http://localhost:3000/admin/anggota) & klik *"Tambah Pengurus Baru"*. Unggah foto untuk melihat *Discord-style circle crop modal*.
-   - **Coba Cropper Galeri/Berita**: Buka [http://localhost:3000/admin/gallery](http://localhost:3000/admin/gallery) atau [http://localhost:3000/admin/berita](http://localhost:3000/admin/berita) untuk mencoba crop rasio 16:9 sampul warta.
+- **Avatar Pengurus (`/admin/anggota`)**: Bingkai crop berbentuk lingkaran 1:1 presisi gaya Discord.
+- **Sampul Berita & Galeri (`/admin/berita` & `/admin/gallery`)**: Bingkai persegi dengan rasio aspek default 16:9.
+- **Hasil Crop**: Diproses melalui HTML5 Canvas menjadi berkas Blob/File beresolusi pas dan langsung diunggah ke Cloudinary.
